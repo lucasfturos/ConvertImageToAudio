@@ -4,11 +4,13 @@
 set(SRC_HEADERS
     common/util.hpp
     ToneGenerate/tone_gen.hpp
+    ImageColorConverter/img_color_conv.hpp
 )
 
 # List all the source files in the src directory
 set(SRC_SOURCES
     ToneGenerate/tone_gen.cpp
+    ImageColorConverter/img_color_conv.cpp
     main.cpp
 )
 
