@@ -2,7 +2,7 @@
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename), duration(120.0) {
+    : m_filename(filename), duration(128.0) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -22,12 +22,15 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
+void ToneGenerate::setComplexNumber(std::complex<double> z_) { color = z_; }
+
 std::vector<int16_t> ToneGenerate::generateWaveform() {
     std::vector<int16_t> samples;
-    for (int i = 0; i < duration * SAMPLERATE; i++) {
-        double sample_double =
-            AMPLITUDE * std::sin(2.0 * PI * FREQUENCY * i / SAMPLERATE);
-        int16_t sample = static_cast<int16_t>(sample_double * AMP_NORMALIZED);
+    for (int i = 0; i < duration * SAMPLERATE; ++i) {
+        double t = static_cast<double>(i) / SAMPLERATE;
+        std::complex<double> zt = std::exp(color * t);
+        int16_t sample =
+            static_cast<int16_t>(AMPLITUDE * zt.real() * AMP_NORMALIZED);
         samples.push_back(sample);
     }
     return samples;

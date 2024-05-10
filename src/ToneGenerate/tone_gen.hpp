@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <complex>
 #include <cstdint>
 #include <sndfile.h>
 #include <stdexcept>
@@ -10,7 +11,6 @@
 class ToneGenerate {
   private:
     const int SAMPLERATE = 44100;
-
     const double PI = M_PI;
     const double AMPLITUDE = 0.5;
     const double FREQUENCY = 60.0;
@@ -23,10 +23,12 @@ class ToneGenerate {
 
   private:
     double duration;
+    std::complex<double> color;
 
     std::vector<int16_t> generateWaveform();
 
   public:
+    void setComplexNumber(std::complex<double> z_);
     void saveAudio();
 
     ToneGenerate(const std::string &filename, int format, int channels);

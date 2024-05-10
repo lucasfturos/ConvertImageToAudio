@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../ImageColorConverter/img_color_conv.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <filesystem>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <sndfile.h>
@@ -71,6 +73,33 @@ inline int getAudioType(const std::string &extAudio) {
     }
 
     return it->second;
+}
+
+inline void printPPM(std::vector<Color> colors) {
+    std::cout << "P3\n";
+    std::cout << "128 128\n";
+    std::cout << "255\n";
+    for (const auto &color : colors) {
+        std::cout << static_cast<int>(color.r * 255) << ' '
+                  << static_cast<int>(color.g * 255) << ' '
+                  << static_cast<int>(color.b * 255) << '\n';
+    }
+}
+
+inline void printRGB(std::vector<Color> colors) {
+    for (const auto &color : colors) {
+        std::cout << "(R: "  << std::setprecision(2)<< std::min(color.r, 1.0)
+                  << ", G: " << std::setprecision(2)<< std::min(color.g, 1.0)
+                  << " B: "  << std::setprecision(2)<< std::min(color.b, 1.0) << ")\n";
+    }
+}
+
+inline void printHSV(std::vector<Color> colors) {
+    for (const auto &color : colors) {
+        std::cout << "(H: " << static_cast<int>(color.h)
+                  << ", S: " << static_cast<int>(color.s)
+                  << " V: " << static_cast<int>(color.v) << ")\n";
+    }
 }
 
 } // namespace utilMain

@@ -20,7 +20,51 @@ ImageColorConverter::~ImageColorConverter() {
 
 std::vector<Color> ImageColorConverter::getColors() { return colors; }
 
+void ImageColorConverter::RGBToHSV(Color color) {
+    double eps = std::numeric_limits<double>::epsilon();
+    double cmax = std::max(color.r, std::max(color.g, color.b));
+    double cmin = std::min(color.r, std::min(color.g, color.b));
+    double delta = cmax - cmin;
+
+    double tempH = 0.0;
+    if (delta < eps) {
+        tempH = 0.0;
+    } else if (cmax == color.r) {
+        tempH = 60.0 * std::fmod((color.g - color.b) / delta, 6.0);
+    } else if (cmax == color.g) {
+        tempH = 60.0 * ((color.b - color.r) / delta + 2.0);
+    } else if (cmax == color.b) {
+        tempH = 60.0 * ((color.r - color.g) / delta + 4.0);
+    } else {
+        assert(0 && "Inaccessible");
+    }
+
+    double tempL = (cmax + cmax) / 2.0;
+    double tempS;
+    if (delta < eps) {
+        tempS = 0.0;
+    } else {
+        tempS = delta / (1.0 - std::fabs(2 * tempL - 1.0));
+    }
+
+    color.h = std::fmod(std::fmod(tempH, 360.0) + 360.0, 360.0);
+    color.s = (tempS * 100.0);
+    color.v = (tempL * 100.0);
+    colors.push_back(color);
+}
+
+double ImageColorConverter::g(double x) {
+    return std::pow(1 - 1 / (1 + x * x), 0.2);
+}
+
+std::complex<double> ImageColorConverter::HSVToComplex(Color color) {
+    double angle = 2 * M_PI * (color.h - 1);
+    double radius = color.s * g(color.v);
+    return std::polar(radius, angle);
+}
+
 void ImageColorConverter::processImageColor() {
+    Color color;
     int width, height;
 
     m_pixels = reinterpret_cast<uint32_t *>(
@@ -48,7 +92,8 @@ void ImageColorConverter::processImageColor() {
             r *= a;
             g *= a;
             b *= a;
-            colors.push_back({.r = r, .g = g, .b = b});
+            color = {r, g, b, 0, 0, 0};
+            RGBToHSV(color);
         }
     }
 }
