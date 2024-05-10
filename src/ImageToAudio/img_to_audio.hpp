@@ -2,8 +2,8 @@
 
 #include "../ImageColorConverter/img_color_conv.hpp"
 #include "../ToneGenerate/tone_gen.hpp"
+#include <iostream>
 #include <memory>
-#include <vector>
 
 class ImageToAudio {
   private:
@@ -15,6 +15,5 @@ class ImageToAudio {
 
   public:
     void run();
-    ImageToAudio(const std::vector<std::string> &filename, int format,
-                 int channels);
+    ImageToAudio(int argc, char **argv);
 };

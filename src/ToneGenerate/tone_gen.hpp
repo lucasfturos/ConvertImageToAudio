@@ -22,7 +22,6 @@ class ToneGenerate {
     int m_channels;
 
   private:
-    double duration;
     std::complex<double> color;
 
     std::vector<int16_t> generateWaveform();

@@ -1,4 +1,5 @@
 #include "img_color_conv.hpp"
+#include <cmath>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
@@ -44,7 +45,7 @@ void ImageColorConverter::RGBToHSV(Color color) {
     if (delta < eps) {
         tempS = 0.0;
     } else {
-        tempS = delta / (1.0 - std::fabs(2 * tempL - 1.0));
+        tempS = delta / (1.0 - std::fabs(2.0 * tempL - 1.0));
     }
 
     color.h = std::fmod(std::fmod(tempH, 360.0) + 360.0, 360.0);
@@ -53,14 +54,12 @@ void ImageColorConverter::RGBToHSV(Color color) {
     colors.push_back(color);
 }
 
-double ImageColorConverter::g(double x) {
-    return std::pow(1 - 1 / (1 + x * x), 0.2);
-}
-
 std::complex<double> ImageColorConverter::HSVToComplex(Color color) {
-    double angle = 2 * M_PI * (color.h - 1);
-    double radius = color.s * g(color.v);
-    return std::polar(radius, angle);
+    double x = color.v;
+    double y = color.s;
+    double theta = color.h * M_PI / 180.0;
+    double r = std::sqrt((x * x) + (y * y));
+    return std::complex<double>(r * std::sin(theta), r * std::cos(theta));
 }
 
 void ImageColorConverter::processImageColor() {
@@ -82,8 +81,8 @@ void ImageColorConverter::processImageColor() {
         sizeof(uint32_t) * width, reinterpret_cast<u_char *>(m_resize_pixels),
         resize_width, resize_height, sizeof(uint32_t) * resize_width, 4);
 
-    for (int y = 0; y < resize_height; y++) {
-        for (int x = 0; x < resize_width; x++) {
+    for (int y = 0; y < resize_height; ++y) {
+        for (int x = 0; x < resize_width; ++x) {
             uint32_t pixel = m_resize_pixels[y * resize_width + x];
             double r = ((pixel >> 8 * 0) & 0xFF) / 255.0;
             double g = ((pixel >> 8 * 1) & 0xFF) / 255.0;
@@ -92,7 +91,11 @@ void ImageColorConverter::processImageColor() {
             r *= a;
             g *= a;
             b *= a;
-            color = {r, g, b, 0, 0, 0};
+            double gray_value = (r + g + b) / 3.0;
+            r = gray_value;
+            g = gray_value;
+            b = gray_value;
+            color = {.r = r, .g = g, .b = b};
             RGBToHSV(color);
         }
     }

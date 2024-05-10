@@ -1,8 +1,9 @@
 #include "tone_gen.hpp"
+#include <cmath>
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename), duration(128.0) {
+    : m_filename(filename) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -26,7 +27,7 @@ void ToneGenerate::setComplexNumber(std::complex<double> z_) { color = z_; }
 
 std::vector<int16_t> ToneGenerate::generateWaveform() {
     std::vector<int16_t> samples;
-    for (int i = 0; i < duration * SAMPLERATE; ++i) {
+    for (int i = 0; i < SAMPLERATE; ++i) {
         double t = static_cast<double>(i) / SAMPLERATE;
         std::complex<double> zt = std::exp(color * t);
         int16_t sample =

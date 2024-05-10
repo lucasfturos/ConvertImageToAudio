@@ -2,16 +2,30 @@
 #include "../common/util.hpp"
 
 using namespace util;
+using namespace test;
 
-ImageToAudio::ImageToAudio(const std::vector<std::string> &filename, int format,
-                           int channels)
-    : m_toneGen(std::make_shared<ToneGenerate>(filename[0], format, channels)),
-      m_imgColorConv(std::make_shared<ImageColorConverter>(filename[1])) {
-    filenameAudio = filename[0];
+ImageToAudio::ImageToAudio(int argc, char **argv) {
+    CLIMessageError(argc);
+    filenameAudio = argv[2];
+    std::string filenameImage = argv[1];
+    int channel = std::stoi(argv[3]);
+    std::string extAudio = getAudioExtension(filenameAudio);
+    int format = getAudioType(toUppercase(extAudio));
+
+    m_toneGen = std::make_shared<ToneGenerate>(filenameAudio, format, channel);
+    m_imgColorConv = std::make_shared<ImageColorConverter>(filenameImage);
 }
 
 void ImageToAudio::run() {
-    createDirectory(filenameAudio);
-    m_toneGen->setComplexNumber(std::complex<double>(0, 2 * M_PI * 60.0));
+    if (!createDirectory(filenameAudio)) {
+        throw std::runtime_error(std::string(
+            "Failed to create directory for audio file: " + filenameAudio));
+    }
+    std::vector<Color> colors = m_imgColorConv->getColors();
+    for (const auto &color : colors) {
+        m_toneGen->setComplexNumber(m_imgColorConv->HSVToComplex(color));
+    }
+    // m_toneGen->setComplexNumber(std::complex<double>(0, 2 * M_PI * 60.0));
     m_toneGen->saveAudio();
+    // printPPM(colors);
 }

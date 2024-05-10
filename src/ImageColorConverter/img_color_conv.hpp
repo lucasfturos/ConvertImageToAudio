@@ -17,11 +17,12 @@ struct Color {
 class ImageColorConverter {
   private:
     std::string m_filename;
+
+  private:
     uint32_t *m_pixels;
     uint32_t *m_resize_pixels;
     std::vector<Color> colors;
 
-    double g(double x);
     void processImageColor();
     void RGBToHSV(Color color);
 

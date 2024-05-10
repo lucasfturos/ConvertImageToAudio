@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../ImageColorConverter/img_color_conv.hpp"
-#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
@@ -12,7 +11,6 @@
 #include <unordered_map>
 
 namespace util {
-namespace fs = std::filesystem;
 
 inline std::string toUppercase(const std::string &filenameAudio) {
     std::string uppercaseFilename = filenameAudio;
@@ -21,31 +19,32 @@ inline std::string toUppercase(const std::string &filenameAudio) {
     return uppercaseFilename;
 }
 
-inline void createDirectory(const std::string &directoryPath) {
+namespace fs = std::filesystem;
+inline bool createDirectory(const std::string &directoryPath) {
     fs::path path = fs::absolute(directoryPath);
     fs::path parentPath = path.parent_path();
-    if (!fs::exists(parentPath)) {
-        std::cout << "Parent directory does not exist: " + parentPath.string()
+    fs::path audioDirectory = path.parent_path();
+    while (audioDirectory.filename() != "audio" &&
+           audioDirectory != audioDirectory.root_path()) {
+        audioDirectory = audioDirectory.parent_path();
+    }
+    if (audioDirectory.filename() != "audio") {
+        std::cerr << "Failed to find 'audio' directory in: " << parentPath
                   << '\n';
+        return false;
     }
-
-    if (fs::exists(path) && fs::is_directory(path)) {
-        std::cout << "Directory already exists: " << directoryPath << std::endl;
-        return;
+    if (!fs::exists(audioDirectory)) {
+        if (!fs::create_directory(audioDirectory)) {
+            std::cerr << "Failed to create directory: " << audioDirectory
+                      << '\n';
+            return false;
+        }
+        std::cout << "Directory created: " << audioDirectory << '\n';
     }
-
-    if (!fs::create_directory(parentPath)) {
-        std::cerr << "Failed to create directory: " << parentPath << '\n';
-    }
-
-    std::cout << "Directory created: " << parentPath << '\n';
+    return true;
 }
 
-} // namespace util
-
-namespace utilMain {
-
-inline void inputCLIMessageError(int argc) {
+inline void CLIMessageError(int argc) {
     if (argc < 2) {
         throw std::runtime_error(
             std::string("Enter an image, directory and audio name, and the "
@@ -66,14 +65,16 @@ inline int getAudioType(const std::string &extAudio) {
         {"FLAC", SF_FORMAT_FLAC},
         {"OGG", SF_FORMAT_OGG},
     };
-
     auto it = typeAudioOption.find(extAudio);
     if (it == typeAudioOption.end()) {
         throw std::invalid_argument("Invalid audio file extension!");
     }
-
     return it->second;
 }
+
+} // namespace util
+
+namespace test {
 
 inline void printPPM(std::vector<Color> colors) {
     std::cout << "P3\n";
@@ -88,9 +89,10 @@ inline void printPPM(std::vector<Color> colors) {
 
 inline void printRGB(std::vector<Color> colors) {
     for (const auto &color : colors) {
-        std::cout << "(R: "  << std::setprecision(2)<< std::min(color.r, 1.0)
-                  << ", G: " << std::setprecision(2)<< std::min(color.g, 1.0)
-                  << " B: "  << std::setprecision(2)<< std::min(color.b, 1.0) << ")\n";
+        std::cout << "(R: " << std::setprecision(2) << std::min(color.r, 1.0)
+                  << ", G: " << std::setprecision(2) << std::min(color.g, 1.0)
+                  << " B: " << std::setprecision(2) << std::min(color.b, 1.0)
+                  << ")\n";
     }
 }
 
@@ -102,4 +104,4 @@ inline void printHSV(std::vector<Color> colors) {
     }
 }
 
-} // namespace utilMain
+} // namespace test
