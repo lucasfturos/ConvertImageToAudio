@@ -27,5 +27,4 @@ void ImageToAudio::run() {
     }
     // m_toneGen->setComplexNumber(std::complex<double>(0, 2 * M_PI * 60.0));
     m_toneGen->saveAudio();
-    // printPPM(colors);
 }

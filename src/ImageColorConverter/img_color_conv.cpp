@@ -27,30 +27,28 @@ void ImageColorConverter::RGBToHSV(Color color) {
     double cmin = std::min(color.r, std::min(color.g, color.b));
     double delta = cmax - cmin;
 
-    double tempH = 0.0;
     if (delta < eps) {
-        tempH = 0.0;
-    } else if (cmax == color.r) {
-        tempH = 60.0 * std::fmod((color.g - color.b) / delta, 6.0);
-    } else if (cmax == color.g) {
-        tempH = 60.0 * ((color.b - color.r) / delta + 2.0);
-    } else if (cmax == color.b) {
-        tempH = 60.0 * ((color.r - color.g) / delta + 4.0);
+        color.h = 0.0;
+        color.s = 0.0;
+        color.v = cmax;
     } else {
-        assert(0 && "Inaccessible");
+        if (cmax == color.r) {
+            color.h = 60.0 * (std::fmod((color.g - color.b) / delta, 6.0));
+        } else if (cmax == color.g) {
+            color.h = 60.0 * ((color.b - color.r) / delta + 2.0);
+        } else if (cmax == color.b) {
+            color.h = 60.0 * ((color.r - color.g) / delta + 4.0);
+        } else {
+            assert(0 && "Inaccessible");
+        }
+        color.s = delta / cmax;
+        color.v = cmax;
     }
 
-    double tempL = (cmax + cmax) / 2.0;
-    double tempS;
-    if (delta < eps) {
-        tempS = 0.0;
-    } else {
-        tempS = delta / (1.0 - std::fabs(2.0 * tempL - 1.0));
-    }
+    color.h = fmod(fmod(color.h, 360.0) + 360.0, 360.0);
+    color.s *= 100.0;
+    color.v *= 100.0;
 
-    color.h = std::fmod(std::fmod(tempH, 360.0) + 360.0, 360.0);
-    color.s = (tempS * 100.0);
-    color.v = (tempL * 100.0);
     colors.push_back(color);
 }
 
