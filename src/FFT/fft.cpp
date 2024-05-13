@@ -10,11 +10,11 @@
  * Rertono: A amplitude (módulo) do número complexo `z`, calculada como a
  * raiz quadrada da soma dos quadrados das partes real e imaginária.
  */
-template <class T, typename ComplexType>
-inline ComplexType FFT<T, ComplexType>::amp(Complex<ComplexType> z) {
+template <typename ComplexType>
+ComplexType FFT<ComplexType>::amp(Complex<ComplexType> z) {
     ComplexType a = z.real();
     ComplexType b = z.imag();
-    return sqrtf(a * a + b * b);
+    return std::sqrt(a * a + b * b);
 }
 
 /*!
@@ -29,8 +29,8 @@ inline ComplexType FFT<T, ComplexType>::amp(Complex<ComplexType> z) {
  *
  * Returno: O índice `k` com seus bits revertidos.
  */
-template <class T, typename ComplexType>
-std::size_t FFT<T, ComplexType>::bitReverse(std::size_t k, std::size_t n) {
+template <typename ComplexType>
+std::size_t FFT<ComplexType>::bitReverse(std::size_t k, std::size_t n) {
     std::size_t reversed = 0;
     for (std::size_t i = 0; i < n; i++) {
         reversed = (reversed << 1) | (k & 1);
@@ -48,9 +48,9 @@ std::size_t FFT<T, ComplexType>::bitReverse(std::size_t k, std::size_t n) {
  *
  * `n`: O tamanho do vetor de dados de entrada.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::applyHannWindow(std::vector<Complex<ComplexType>> &in,
-                                          std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::applyHannWindow(std::vector<Complex<ComplexType>> &in,
+                                       std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         ComplexType t = static_cast<ComplexType>(i) / (n - 1);
         ComplexType hann = 0.5 - 0.5 * std::cos(2 * pi * t);
@@ -67,9 +67,9 @@ void FFT<T, ComplexType>::applyHannWindow(std::vector<Complex<ComplexType>> &in,
  *
  * `n`: O tamanho do vetor de dados de entrada.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::applyHammingWindow(
-    std::vector<Complex<ComplexType>> &in, std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::applyHammingWindow(std::vector<Complex<ComplexType>> &in,
+                                          std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         ComplexType t = static_cast<ComplexType>(i) / (n - 1);
         ComplexType hamming = 0.54 - 0.46 * std::cos(2 * pi * t);
@@ -86,8 +86,8 @@ void FFT<T, ComplexType>::applyHammingWindow(
  *
  * `n`: O tamanho do vetor de dados de entrada.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::applyBlackmanWindow(
+template <typename ComplexType>
+void FFT<ComplexType>::applyBlackmanWindow(
     std::vector<Complex<ComplexType>> &in, std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         ComplexType t = static_cast<ComplexType>(i) / (n - 1);
@@ -106,9 +106,9 @@ void FFT<T, ComplexType>::applyBlackmanWindow(
  *
  * `n`: O tamanho do vetor de dados de entrada.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::applyFlattopWindow(
-    std::vector<Complex<ComplexType>> &in, std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::applyFlattopWindow(std::vector<Complex<ComplexType>> &in,
+                                          std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         ComplexType t = static_cast<ComplexType>(i) / (n - 1);
         ComplexType flattop =
@@ -133,11 +133,10 @@ void FFT<T, ComplexType>::applyFlattopWindow(
  *
  * `n`: O tamanho do vetor de dados de entrada e saída.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::fft(std::vector<Complex<ComplexType>> &in,
-                              std::size_t stride,
-                              std::vector<std::complex<ComplexType>> &out,
-                              std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::fft(std::vector<Complex<ComplexType>> &in,
+                           std::vector<std::complex<ComplexType>> &out,
+                           std::size_t n) {
     if (n == 1) {
         out[0] = in[0];
         return;
@@ -147,11 +146,11 @@ void FFT<T, ComplexType>::fft(std::vector<Complex<ComplexType>> &in,
     for (std::size_t k = 0; k < n; k++) {
         std::size_t rev_k =
             bitReverse(k, static_cast<std::size_t>(std::log2(n)));
-        in_reversed[k] = in[rev_k * stride];
+        in_reversed[k] = in[rev_k];
     }
 
     std::vector<Complex<ComplexType>> out_reversed(n / 2, 0);
-    fft(in_reversed, stride * 2, out_reversed, n / 2);
+    fft(in_reversed, out_reversed, n / 2);
 
     for (std::size_t k = 0; k < n / 2; k++) {
         ComplexType t = static_cast<ComplexType>(k) / n;
@@ -177,11 +176,10 @@ void FFT<T, ComplexType>::fft(std::vector<Complex<ComplexType>> &in,
  *
  * `n`: O tamanho do vetor de dados de entrada e saída.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
-                                     std::size_t stride,
-                                     std::vector<Complex<ComplexType>> &out,
-                                     std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
+                                  std::vector<Complex<ComplexType>> &out,
+                                  std::size_t n) {
     applyHammingWindow(in, n);
     // applyHannWindow(in, n);
     // applyBlackmanWindow(in, n);
@@ -189,7 +187,7 @@ void FFT<T, ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
 
     std::vector<Complex<ComplexType>> complex_output(n, 0.0);
 
-    fft((in), stride, complex_output, n);
+    fft(in, complex_output, n);
 
     ComplexType step = 1.06;
     ComplexType lowf = 1.0;
@@ -199,15 +197,13 @@ void FFT<T, ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
     for (ComplexType f = lowf; static_cast<std::size_t>(f) < n / 2;
          f = std::ceil(f * step)) {
         ComplexType f1 = std::ceil(f * step);
-        ComplexType a = 0.0f;
+        ComplexType a = 0.0;
         for (std::size_t q = static_cast<std::size_t>(f);
              q < n / 2 && q < static_cast<std::size_t>(f1); ++q) {
             ComplexType b = amp(complex_output[q]);
-            if (b > a)
-                a = b;
+            (b > a) ? a = b : 0;
         }
-        if (max_amp < a)
-            max_amp = a;
+        (max_amp < a) ? max_amp = a : 0;
         out[m++] = a;
     }
 
@@ -233,16 +229,15 @@ void FFT<T, ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
  *
  * `n`: O tamanho do vetor de dados de entrada e saída.
  */
-template <class T, typename ComplexType>
-void FFT<T, ComplexType>::ifft(std::vector<Complex<ComplexType>> &in,
-                               std::size_t stride,
-                               std::vector<Complex<ComplexType>> &out,
-                               std::size_t n) {
+template <typename ComplexType>
+void FFT<ComplexType>::ifft(std::vector<Complex<ComplexType>> &in,
+                            std::vector<Complex<ComplexType>> &out,
+                            std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         in[i] = std::conj(in[i]);
     }
 
-    fft(in, stride, out, n);
+    fft(in, out, n);
 
     for (std::size_t i = 0; i < n; ++i) {
         out[i] = std::conj(out[i]) / static_cast<ComplexType>(n);

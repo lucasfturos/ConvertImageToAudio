@@ -106,7 +106,7 @@ inline void printHSV(std::vector<Color> colors) {
     for (const auto &color : colors) {
         std::cout << "(H: " << static_cast<int>(color.h)
                   << ", S: " << static_cast<int>(color.s)
-                  << " V: " << static_cast<int>(color.v) << ")\n";
+                  << ", V: " << static_cast<int>(color.v) << ")\n";
     }
 }
 

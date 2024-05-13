@@ -17,7 +17,7 @@ class ImageToAudio {
     std::uint32_t *m_pixels;
     std::uint32_t *m_resizePixels;
     std::vector<Complex<double>> spectrum;
-    std::shared_ptr<FFT<std::uint32_t>> fft_ptr;
+    std::shared_ptr<FFT<double>> fft_ptr;
 
   public:
     std::size_t getSpectrumSize();

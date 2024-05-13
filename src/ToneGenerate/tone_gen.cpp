@@ -31,10 +31,11 @@ void ToneGenerate::setSpectrumData(std::vector<std::complex<double>> spectrum,
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
     std::vector<std::int16_t> samples;
     for (std::size_t i = 0; i < m_spectrumSize; ++i) {
-        std::complex<double> spectrum_value = m_spectrum[i];
-        double amplitude = spectrum_value.real();
-        double sample_double = amplitude * AMP_NORMALIZED;
-        int16_t sample = static_cast<int16_t>(sample_double);
+        double spectrum_value = m_spectrum[i].real();
+        double t = static_cast<double>(i) / (m_spectrumSize * SAMPLERATE);
+        double sample_double =
+            spectrum_value * AMPLITUDE * std::sin(2 * PI * FREQUENCY * t);
+        int16_t sample = static_cast<int16_t>(sample_double * AMP_NORMALIZED);
         samples.push_back(sample);
     }
     return samples;

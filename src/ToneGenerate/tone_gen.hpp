@@ -12,7 +12,7 @@ class ToneGenerate {
   private:
     const int SAMPLERATE = 44100;
     const double PI = M_PI;
-    const double AMPLITUDE = 1.0;
+    const double AMPLITUDE = 0.5;
     const double FREQUENCY = 60.0;
     const double AMP_NORMALIZED = 32767.0;
 
