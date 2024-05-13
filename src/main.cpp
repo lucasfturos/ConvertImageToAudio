@@ -1,9 +1,9 @@
-#include "ImageToAudio/img_to_audio.hpp"
+#include "CApp/capp.hpp"
 
 int main(int argc, char **argv) {
     try {
-        auto imgToAudio = std::make_shared<ImageToAudio>(argc, argv);
-        imgToAudio->run();
+        auto app = std::make_shared<CApp>(argc, argv);
+        app->run();
     } catch (const std::exception &e) {
         std::cerr << "Exception: " << e.what() << '\n';
         return EXIT_FAILURE;

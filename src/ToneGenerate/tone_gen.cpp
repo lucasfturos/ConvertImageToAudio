@@ -1,9 +1,8 @@
 #include "tone_gen.hpp"
-#include <cmath>
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename) {
+    : m_filename(filename), fft_ptr(std::make_shared<FFT<std::uint16_t>>()) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -23,22 +22,26 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
-void ToneGenerate::setComplexNumber(std::complex<double> z_) { color = z_; }
+void ToneGenerate::setSpectrumData(std::vector<std::complex<double>> spectrum,
+                                   std::size_t size) {
+    m_spectrum = spectrum;
+    m_spectrumSize = size;
+}
 
-std::vector<int16_t> ToneGenerate::generateWaveform() {
-    std::vector<int16_t> samples;
-    for (int i = 0; i < SAMPLERATE; ++i) {
-        double t = static_cast<double>(i) / SAMPLERATE;
-        std::complex<double> zt = std::exp(color * t);
-        int16_t sample =
-            static_cast<int16_t>(AMPLITUDE * zt.real() * AMP_NORMALIZED);
+std::vector<std::int16_t> ToneGenerate::generateWaveform() {
+    std::vector<std::int16_t> samples;
+    for (std::size_t i = 0; i < m_spectrumSize; ++i) {
+        std::complex<double> spectrum_value = m_spectrum[i];
+        double amplitude = spectrum_value.real();
+        double sample_double = amplitude * AMP_NORMALIZED;
+        int16_t sample = static_cast<int16_t>(sample_double);
         samples.push_back(sample);
     }
     return samples;
 }
 
 void ToneGenerate::saveAudio() {
-    std::vector<int16_t> samples = generateWaveform();
+    std::vector<std::int16_t> samples = generateWaveform();
 
     SF_INFO info;
     info.samplerate = SAMPLERATE;

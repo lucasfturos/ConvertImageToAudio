@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ImageColorConverter/img_color_conv.hpp"
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
@@ -9,6 +9,12 @@
 #include <sndfile.h>
 #include <stdexcept>
 #include <unordered_map>
+#include <vector>
+
+struct Color {
+    double r = 0.0, g = 0.0, b = 0.0;
+    double h = 0.0, s = 0.0, v = 0.0;
+};
 
 namespace util {
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cmath>
-#include <complex>
-#include <cstdint>
+#include "../FFT/fft.hpp"
+#include <algorithm>
+#include <memory>
 #include <sndfile.h>
 #include <stdexcept>
 #include <string>
@@ -12,7 +12,7 @@ class ToneGenerate {
   private:
     const int SAMPLERATE = 44100;
     const double PI = M_PI;
-    const double AMPLITUDE = 0.5;
+    const double AMPLITUDE = 1.0;
     const double FREQUENCY = 60.0;
     const double AMP_NORMALIZED = 32767.0;
 
@@ -22,13 +22,16 @@ class ToneGenerate {
     int m_channels;
 
   private:
-    std::complex<double> color;
+    std::size_t m_spectrumSize;
+    std::shared_ptr<FFT<std::uint16_t>> fft_ptr;
+    std::vector<std::complex<double>> m_spectrum;
 
-    std::vector<int16_t> generateWaveform();
+    std::vector<std::int16_t> generateWaveform();
 
   public:
-    void setComplexNumber(std::complex<double> z_);
     void saveAudio();
+    void setSpectrumData(std::vector<std::complex<double>> spectrum,
+                         std::size_t size);
 
     ToneGenerate(const std::string &filename, int format, int channels);
 };

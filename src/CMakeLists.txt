@@ -2,17 +2,19 @@
 
 # List all the header files in the src directory
 set(SRC_HEADERS
+    FFT/fft.hpp
+    CApp/capp.hpp
     common/util.hpp
     ToneGenerate/tone_gen.hpp
     ImageToAudio/img_to_audio.hpp
-    ImageColorConverter/img_color_conv.hpp
 )
 
 # List all the source files in the src directory
 set(SRC_SOURCES
+    FFT/fft.cpp
+    CApp/capp.cpp
     ToneGenerate/tone_gen.cpp
     ImageToAudio/img_to_audio.cpp
-    ImageColorConverter/img_color_conv.cpp
     main.cpp
 )
 
