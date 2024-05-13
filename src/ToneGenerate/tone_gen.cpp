@@ -2,7 +2,7 @@
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename), fft_ptr(std::make_shared<FFT<std::uint16_t>>()) {
+    : m_filename(filename), fft_ptr(std::make_shared<FFT<double>>()) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -22,20 +22,20 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
-void ToneGenerate::setSpectrumData(std::vector<std::complex<double>> spectrum,
+void ToneGenerate::setSpectrumData(std::vector<Complex<double>> imageData,
                                    std::size_t size) {
-    m_spectrum = spectrum;
-    m_spectrumSize = size;
+    m_imageData = imageData;
+    m_imageSize = size;
 }
 
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
     std::vector<std::int16_t> samples;
-    for (std::size_t i = 0; i < m_spectrumSize; ++i) {
-        double spectrum_value = m_spectrum[i].real();
-        double t = static_cast<double>(i) / (m_spectrumSize * SAMPLERATE);
-        double sample_double =
-            spectrum_value * AMPLITUDE * std::sin(2 * PI * FREQUENCY * t);
-        int16_t sample = static_cast<int16_t>(sample_double * AMP_NORMALIZED);
+    for (std::size_t i = 0; i < m_imageSize; ++i) {
+        double imageValue = m_imageData[i].real();
+        double t = static_cast<double>(i) / (SAMPLERATE);
+        double sampleDouble =
+            imageValue * AMPLITUDE * std::sin(2 * PI * FREQUENCY * t);
+        int16_t sample = static_cast<int16_t>(sampleDouble * AMP_NORMALIZED);
         samples.push_back(sample);
     }
     return samples;

@@ -13,15 +13,13 @@ class ImageToAudio {
     std::string m_filename;
 
   private:
-    std::size_t imageSize;
     std::uint32_t *m_pixels;
     std::uint32_t *m_resizePixels;
-    std::vector<Complex<double>> spectrum;
-    std::shared_ptr<FFT<double>> fft_ptr;
+    std::vector<Complex<double>> imageData;
 
   public:
-    std::size_t getSpectrumSize();
-    std::vector<Complex<double>> getSpectrum();
+    std::size_t getImageSize();
+    std::vector<Complex<double>> getImageData();
     void processImage();
 
     ImageToAudio(const std::string &filename);

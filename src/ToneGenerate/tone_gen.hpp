@@ -22,15 +22,15 @@ class ToneGenerate {
     int m_channels;
 
   private:
-    std::size_t m_spectrumSize;
-    std::shared_ptr<FFT<std::uint16_t>> fft_ptr;
-    std::vector<std::complex<double>> m_spectrum;
+    std::size_t m_imageSize;
+    std::shared_ptr<FFT<double>> fft_ptr;
+    std::vector<Complex<double>> m_imageData;
 
     std::vector<std::int16_t> generateWaveform();
 
   public:
     void saveAudio();
-    void setSpectrumData(std::vector<std::complex<double>> spectrum,
+    void setSpectrumData(std::vector<Complex<double>> imageData,
                          std::size_t size);
 
     ToneGenerate(const std::string &filename, int format, int channels);

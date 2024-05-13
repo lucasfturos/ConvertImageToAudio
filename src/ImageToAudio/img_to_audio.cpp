@@ -1,14 +1,11 @@
 #include "img_to_audio.hpp"
-#include <iomanip>
-#include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb/stb_image_resize.h>
 
 ImageToAudio::ImageToAudio(const std::string &filename)
-    : m_filename(filename), m_pixels(nullptr), m_resizePixels(nullptr),
-      fft_ptr(std::make_shared<FFT<double>>()) {}
+    : m_filename(filename), m_pixels(nullptr), m_resizePixels(nullptr) {}
 
 ImageToAudio::~ImageToAudio() {
     if (m_pixels) {
@@ -19,11 +16,9 @@ ImageToAudio::~ImageToAudio() {
     }
 }
 
-std::vector<std::complex<double>> ImageToAudio::getSpectrum() {
-    return spectrum;
-}
+std::vector<Complex<double>> ImageToAudio::getImageData() { return imageData; }
 
-std::size_t ImageToAudio::getSpectrumSize() { return spectrum.size(); }
+std::size_t ImageToAudio::getImageSize() { return imageData.size(); }
 
 void ImageToAudio::processImage() {
     int width, height;
@@ -44,7 +39,6 @@ void ImageToAudio::processImage() {
                        reinterpret_cast<u_char *>(m_resizePixels), resizeWidth,
                        resizeHeight, sizeof(std::uint32_t) * resizeWidth, 4);
 
-    imageSize = resizeWidth * resizeHeight;
     for (int y = 0; y < resizeHeight; y++) {
         for (int x = 0; x < resizeWidth; x++) {
             std::uint32_t pixel = m_resizePixels[y * resizeWidth + x];
@@ -56,7 +50,7 @@ void ImageToAudio::processImage() {
             g *= a / 255.0 / 255.0;
             b *= a / 255.0 / 255.0;
             double intensity = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            spectrum.push_back(intensity);
+            imageData.push_back(intensity);
         }
     }
 }

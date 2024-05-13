@@ -22,8 +22,8 @@ void CApp::run() {
             "Failed to create directory for audio file: " + filenameAudio));
     }
     m_imgAudio->processImage();
-    m_toneGen->setSpectrumData(m_imgAudio->getSpectrum(),
-                               m_imgAudio->getSpectrumSize());
+    m_toneGen->setSpectrumData(m_imgAudio->getImageData(),
+                               m_imgAudio->getImageSize());
     m_toneGen->saveAudio();
     std::cout << "Done\n";
 }
