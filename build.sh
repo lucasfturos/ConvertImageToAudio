@@ -40,7 +40,7 @@ case "$1" in
         cmake --build build/ && ./build/src/ConvertImageToAudio "$2" "$AUDIO_OUTPUT_PATH" 1
         ;;
     -a  | --audacity)
-        audacity "$AUDIO_OUTPUT_PATH"
+        audacity "$AUDIO_OUTPUT_PATH" 2>/dev/null
         ;;
     -rm | --remove)
         # Remove o arquivo de áudio
