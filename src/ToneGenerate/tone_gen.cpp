@@ -1,4 +1,5 @@
 #include "tone_gen.hpp"
+#include <iostream>
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
@@ -22,21 +23,31 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
-void ToneGenerate::setSpectrumData(std::vector<Complex<double>> imageData,
-                                   std::size_t size) {
+void ToneGenerate::setImageData(std::vector<Complex<double>> imageData,
+                                std::size_t size) {
     m_imageData = imageData;
     m_imageSize = size;
+
+    m_frequencyData.resize(size, 0);
+    fft_ptr->fftAnalyze(imageData, m_frequencyData, size);
 }
 
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
-    std::vector<std::int16_t> samples;
-    for (std::size_t i = 0; i < m_imageSize; ++i) {
-        double imageValue = m_imageData[i].real();
-        double t = static_cast<double>(i) / (SAMPLERATE);
-        double sampleDouble =
-            imageValue * AMPLITUDE * std::sin(2 * PI * FREQUENCY * t);
-        int16_t sample = static_cast<int16_t>(sampleDouble * AMP_NORMALIZED);
-        samples.push_back(sample);
+    std::size_t numSamples = static_cast<std::size_t>(2 * SAMPLERATE);
+    std::vector<std::int16_t> samples(numSamples, 0);
+    for (std::size_t i = 0; i < numSamples; ++i) {
+        double t = static_cast<double>(i) / numSamples;
+        double sample = 0.0;
+        for (std::size_t j = 0; j < m_frequencyData.size(); ++j) {
+            double frequency =
+                (static_cast<double>(j) / m_frequencyData.size()) * numSamples;
+            double amplitude = std::abs(m_frequencyData[j]);
+            sample +=
+                amplitude * AMPLITUDE * std::sin(2.0 * PI * frequency * t);
+        }
+        samples[i] = static_cast<std::int16_t>(sample * AMP_NORMALIZED);
+        samples[i] = std::clamp<std::int16_t>(samples[i], -AMP_NORMALIZED,
+                                              AMP_NORMALIZED);
     }
     return samples;
 }

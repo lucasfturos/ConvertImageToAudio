@@ -135,29 +135,30 @@ void FFT<ComplexType>::applyFlattopWindow(std::vector<Complex<ComplexType>> &in,
  */
 template <typename ComplexType>
 void FFT<ComplexType>::fft(std::vector<Complex<ComplexType>> &in,
-                           std::vector<std::complex<ComplexType>> &out,
+                           std::vector<Complex<ComplexType>> &out,
                            std::size_t n) {
     if (n == 1) {
         out[0] = in[0];
         return;
     }
 
-    std::vector<Complex<ComplexType>> in_reversed(n, 0);
-    for (std::size_t k = 0; k < n; k++) {
-        std::size_t rev_k =
-            bitReverse(k, static_cast<std::size_t>(std::log2(n)));
-        in_reversed[k] = in[rev_k];
+    std::vector<Complex<ComplexType>> in_even(n / 2);
+    std::vector<Complex<ComplexType>> in_odd(n / 2);
+    for (std::size_t i = 0; i < n / 2; ++i) {
+        in_even[i] = in[i * 2];
+        in_odd[i] = in[i * 2 + 1];
     }
 
-    std::vector<Complex<ComplexType>> out_reversed(n / 2, 0);
-    fft(in_reversed, out_reversed, n / 2);
+    std::vector<Complex<ComplexType>> out_even(n / 2);
+    std::vector<Complex<ComplexType>> out_odd(n / 2);
+    fft(in_even, out_even, n / 2);
+    fft(in_odd, out_odd, n / 2);
 
-    for (std::size_t k = 0; k < n / 2; k++) {
-        ComplexType t = static_cast<ComplexType>(k) / n;
-        Complex<ComplexType> v = exp(-2.0 * 1i * pi * t) * out_reversed[k];
-        Complex<ComplexType> e = out_reversed[k];
-        out[k] = e + v;
-        out[k + n / 2] = e - v;
+    for (std::size_t k = 0; k < n / 2; ++k) {
+        Complex<ComplexType> t =
+            std::polar(1.0, -2.0 * pi * k / n) * out_odd[k];
+        out[k] = out_even[k] + t;
+        out[k + n / 2] = out_even[k] - t;
     }
 }
 
@@ -181,30 +182,21 @@ void FFT<ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
                                   std::vector<Complex<ComplexType>> &out,
                                   std::size_t n) {
     applyHammingWindow(in, n);
-    // applyHannWindow(in, n);
-    // applyBlackmanWindow(in, n);
-    // applyFlattopWindow(in, n);
 
     std::vector<Complex<ComplexType>> complex_output(n, 0.0);
 
     fft(in, complex_output, n);
 
-    ComplexType step = 1.06;
-    ComplexType lowf = 1.0;
-    std::size_t m = 0;
-    ComplexType max_amp = 1.0;
+    for (std::size_t i = 0; i < n; ++i) {
+        out[i] = complex_output[i];
+    }
 
-    for (ComplexType f = lowf; static_cast<std::size_t>(f) < n / 2;
-         f = std::ceil(f * step)) {
-        ComplexType f1 = std::ceil(f * step);
-        ComplexType a = 0.0;
-        for (std::size_t q = static_cast<std::size_t>(f);
-             q < n / 2 && q < static_cast<std::size_t>(f1); ++q) {
-            ComplexType b = amp(complex_output[q]);
-            (b > a) ? a = b : 0;
+    ComplexType max_amp = 1.0;
+    for (std::size_t i = 0; i < n / 2; ++i) {
+        ComplexType amplitude = amp(out[i]);
+        if (amplitude > max_amp) {
+            max_amp = amplitude;
         }
-        (max_amp < a) ? max_amp = a : 0;
-        out[m++] = a;
     }
 
     for (std::size_t i = 0; i < n / 2; ++i) {

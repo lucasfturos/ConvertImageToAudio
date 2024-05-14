@@ -27,7 +27,7 @@ void ImageToAudio::processImage() {
         stbi_load(m_filename.c_str(), &width, &height, NULL, 4));
     assert(m_pixels != nullptr && "Error loading image!");
 
-    int resizeWidth = 128;
+    int resizeWidth = 64;
     int resizeHeight = height * resizeWidth / width;
     m_resizePixels = static_cast<std::uint32_t *>(
         malloc(sizeof(std::uint32_t) * resizeWidth * resizeHeight));
@@ -42,13 +42,13 @@ void ImageToAudio::processImage() {
     for (int y = 0; y < resizeHeight; y++) {
         for (int x = 0; x < resizeWidth; x++) {
             std::uint32_t pixel = m_resizePixels[y * resizeWidth + x];
-            double r = (pixel >> 8 * 0) & 0xFF;
-            double g = (pixel >> 8 * 1) & 0xFF;
-            double b = (pixel >> 8 * 2) & 0xFF;
-            double a = (pixel >> 8 * 3) & 0xFF;
-            r *= a / 255.0 / 255.0;
-            g *= a / 255.0 / 255.0;
-            b *= a / 255.0 / 255.0;
+            double r = ((pixel >> 8 * 0) & 0xFF) / 255.0;
+            double g = ((pixel >> 8 * 1) & 0xFF) / 255.0;
+            double b = ((pixel >> 8 * 2) & 0xFF) / 255.0;
+            // double a = ((pixel >> 8 * 3) & 0xFF) / 255.0;
+            // r *= a;
+            // g *= a;
+            // b *= a;
             double intensity = 0.2126 * r + 0.7152 * g + 0.0722 * b;
             imageData.push_back(intensity);
         }

@@ -39,3 +39,7 @@ make
 ```
 ./src/ConvertImageToAudio assets/img/image.png " "assets/audio/out.wav 1
 ```
+
+## Créditos
+
+[Audacity](https://www.audacityteam.org/)

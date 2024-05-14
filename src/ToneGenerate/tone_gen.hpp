@@ -25,13 +25,13 @@ class ToneGenerate {
     std::size_t m_imageSize;
     std::shared_ptr<FFT<double>> fft_ptr;
     std::vector<Complex<double>> m_imageData;
+    std::vector<Complex<double>> m_frequencyData;
 
     std::vector<std::int16_t> generateWaveform();
 
   public:
     void saveAudio();
-    void setSpectrumData(std::vector<Complex<double>> imageData,
-                         std::size_t size);
+    void setImageData(std::vector<Complex<double>> imageData, std::size_t size);
 
     ToneGenerate(const std::string &filename, int format, int channels);
 };

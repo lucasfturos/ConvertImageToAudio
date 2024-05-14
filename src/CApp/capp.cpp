@@ -9,6 +9,7 @@ CApp::CApp(int argc, char **argv) {
     filenameAudio = argv[2];
     std::string filenameImage = argv[1];
     int channel = std::stoi(argv[3]);
+    
     std::string extAudio = getAudioExtension(filenameAudio);
     int format = getAudioType(toUppercase(extAudio));
 
@@ -22,8 +23,8 @@ void CApp::run() {
             "Failed to create directory for audio file: " + filenameAudio));
     }
     m_imgAudio->processImage();
-    m_toneGen->setSpectrumData(m_imgAudio->getImageData(),
-                               m_imgAudio->getImageSize());
+    m_toneGen->setImageData(m_imgAudio->getImageData(),
+                            m_imgAudio->getImageSize());
     m_toneGen->saveAudio();
     std::cout << "Done\n";
 }
