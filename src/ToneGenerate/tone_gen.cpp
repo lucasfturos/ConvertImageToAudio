@@ -36,14 +36,14 @@ std::vector<std::int16_t> ToneGenerate::generateWaveform() {
     std::size_t numSamples = static_cast<std::size_t>(2 * SAMPLERATE);
     std::vector<std::int16_t> samples(numSamples, 0);
     for (std::size_t i = 0; i < numSamples; ++i) {
-        double t = static_cast<double>(i) / numSamples;
+        double t = static_cast<double>(i) / SAMPLERATE;
         double sample = 0.0;
         for (std::size_t j = 0; j < m_frequencyData.size(); ++j) {
             double frequency =
-                (static_cast<double>(j) / m_frequencyData.size()) * numSamples;
+                (static_cast<double>(j) / m_frequencyData.size()) * SAMPLERATE;
             double amplitude = std::abs(m_frequencyData[j]);
             sample +=
-                amplitude * AMPLITUDE * std::sin(2.0 * PI * frequency * t);
+                amplitude * std::sin(2.0 * PI * frequency * t);
         }
         samples[i] = static_cast<std::int16_t>(sample * AMP_NORMALIZED);
         samples[i] = std::clamp<std::int16_t>(samples[i], -AMP_NORMALIZED,

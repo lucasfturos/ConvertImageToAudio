@@ -14,7 +14,7 @@ template <typename ComplexType>
 ComplexType FFT<ComplexType>::amp(Complex<ComplexType> z) {
     ComplexType a = z.real();
     ComplexType b = z.imag();
-    return std::sqrt(a * a + b * b);
+    return std::log(std::sqrt(a * a + b * b));
 }
 
 /*!
@@ -29,15 +29,15 @@ ComplexType FFT<ComplexType>::amp(Complex<ComplexType> z) {
  *
  * Returno: O índice `k` com seus bits revertidos.
  */
-template <typename ComplexType>
-std::size_t FFT<ComplexType>::bitReverse(std::size_t k, std::size_t n) {
-    std::size_t reversed = 0;
-    for (std::size_t i = 0; i < n; i++) {
-        reversed = (reversed << 1) | (k & 1);
-        k >>= 1;
-    }
-    return reversed;
-}
+// template <typename ComplexType>
+// std::size_t FFT<ComplexType>::bitReverse(std::size_t k, std::size_t n) {
+//     std::size_t reversed = 0;
+//     for (std::size_t i = 0; i < n; i++) {
+//         reversed = (reversed << 1) | (k & 1);
+//         k >>= 1;
+//     }
+//     return reversed;
+// }
 
 /*!
  * Janela de Hann
@@ -181,7 +181,10 @@ template <typename ComplexType>
 void FFT<ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
                                   std::vector<Complex<ComplexType>> &out,
                                   std::size_t n) {
-    applyHammingWindow(in, n);
+    // applyHammingWindow(in, n);
+    applyHannWindow(in, n);
+    // applyBlackmanWindow(in, n);
+    // applyFlattopWindow(in, n);
 
     std::vector<Complex<ComplexType>> complex_output(n, 0.0);
 

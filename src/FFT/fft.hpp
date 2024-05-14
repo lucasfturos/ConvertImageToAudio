@@ -25,7 +25,7 @@ template <typename ComplexType = double> class FFT {
   private:
     inline ComplexType amp(Complex<ComplexType> z);
 
-    std::size_t bitReverse(std::size_t k, std::size_t n);
+    // std::size_t bitReverse(std::size_t k, std::size_t n);
 
     void applyHannWindow(std::vector<Complex<ComplexType>> &in, std::size_t n);
     void applyHammingWindow(std::vector<Complex<ComplexType>> &in,
