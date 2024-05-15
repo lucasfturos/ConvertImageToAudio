@@ -82,9 +82,9 @@ struct Color {
     double h = 0.0, s = 0.0, v = 0.0;
 };
 
-inline void printPPM(std::vector<Color> colors) {
+inline void printPPM(std::vector<Color> colors, int width, int height) {
     std::cout << "P3\n";
-    std::cout << "128 128\n";
+    std::cout << width << " " << height << '\n';
     std::cout << "255\n";
     for (const auto &color : colors) {
         std::cout << static_cast<int>(color.r * 255) << ' '

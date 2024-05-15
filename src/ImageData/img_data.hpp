@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string>
 
-class ImageToAudio {
+class ImageData {
   private:
     std::string m_filename;
 
@@ -17,15 +17,16 @@ class ImageToAudio {
     std::uint32_t *m_resizePixels;
     std::vector<Complex<>> imageData;
 
+    void resizeImage(int *width, int *height);
     double rgbToGrayscale(std::uint32_t pixel);
     std::vector<int> histogramEqualization(std::vector<double> intensities);
-    double applySobelFilterAtPixel(const std::vector<double> &grayscaleImage,
-                                   int x, int y, int width, int height);
+    double applySobelFilter(const std::vector<double> &grayscaleImage, int x,
+                            int y, int width, int height);
 
   public:
     std::vector<Complex<>> getImageData();
     void processImage();
 
-    ImageToAudio(const std::string &filename);
-    ~ImageToAudio();
+    ImageData(const std::string &filename);
+    ~ImageData();
 };

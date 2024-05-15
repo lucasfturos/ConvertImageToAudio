@@ -10,6 +10,7 @@ show_use() {
     echo -e "\t-b\t--build\t\tConstruir o programa"
     echo -e "\t-i\t--init\t\tInicializar o diretório de build"
     echo -e "\t-l\t--list\t\tListar o conteúdo da pasta de áudio"
+    echo -e "\t-ppm\t--run-ppm\tExecuta o programa e gera uma imagem PPM (apenas para teste de cores)."
     echo -e "\t-rm\t--remove\tRemover o arquivo de áudio"
     echo -e "\t-r\t--run\t\tExecutar o programa, ex: $0 -r /caminho/para/imagem.bmp"
 }
@@ -38,6 +39,15 @@ case "$1" in
         fi
         # Comando para compilar e executar o programa;
         cmake --build build/ && ./build/src/ConvertImageToAudio "$2" "$AUDIO_OUTPUT_PATH" 1
+        ;;
+    -ppm | --run-ppm)
+        # Verifica se foi passado o caminho da imagem como parâmetro
+        if [ -z "$2" ]; then
+            echo "Erro: é necessário especificar o caminho da imagem."
+            exit 1
+        fi
+        # Comando para compilar e executar o programa;
+        cmake --build build/ && ./build/src/ConvertImageToAudio "$2" "$AUDIO_OUTPUT_PATH" 1 > build/out.ppm
         ;;
     -a  | --audacity)
         audacity "$AUDIO_OUTPUT_PATH" 2>/dev/null

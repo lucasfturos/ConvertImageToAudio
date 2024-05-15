@@ -5,16 +5,16 @@ set(SRC_HEADERS
     FFT/fft.hpp
     CApp/capp.hpp
     common/util.hpp
+    ImageData/img_data.hpp
     ToneGenerate/tone_gen.hpp
-    ImageToAudio/img_to_audio.hpp
 )
 
 # List all the source files in the src directory
 set(SRC_SOURCES
     FFT/fft.cpp
     CApp/capp.cpp
+    ImageData/img_data.cpp
     ToneGenerate/tone_gen.cpp
-    ImageToAudio/img_to_audio.cpp
     main.cpp
 )
 
