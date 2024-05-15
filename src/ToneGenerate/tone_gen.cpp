@@ -1,9 +1,8 @@
 #include "tone_gen.hpp"
-#include <iostream>
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename), fft_ptr(std::make_shared<FFT<double>>()) {
+    : m_filename(filename), fft_ptr(std::make_shared<FFT<>>()) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -23,31 +22,24 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
-void ToneGenerate::setImageData(std::vector<Complex<double>> imageData,
-                                std::size_t size) {
+void ToneGenerate::setImageData(std::vector<Complex<>> imageData) {
     m_imageData = imageData;
-    m_imageSize = size;
+    m_imageSize = imageData.size();
 
-    m_frequencyData.resize(size, 0);
-    fft_ptr->fftAnalyze(imageData, m_frequencyData, size);
+    m_frequencyData.resize(m_imageSize, 0);
+    fft_ptr->fftAnalyze(imageData, m_frequencyData, m_imageSize);
 }
 
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
-    std::size_t numSamples = static_cast<std::size_t>(2 * SAMPLERATE);
-    std::vector<std::int16_t> samples(numSamples, 0);
-    for (std::size_t i = 0; i < numSamples; ++i) {
-        double t = static_cast<double>(i) / SAMPLERATE;
-        double sample = 0.0;
-        for (std::size_t j = 0; j < m_frequencyData.size(); ++j) {
-            double frequency =
-                (static_cast<double>(j) / m_frequencyData.size()) * SAMPLERATE;
-            double amplitude = std::abs(m_frequencyData[j]);
-            sample +=
-                amplitude * std::sin(2.0 * PI * frequency * t);
-        }
-        samples[i] = static_cast<std::int16_t>(sample * AMP_NORMALIZED);
-        samples[i] = std::clamp<std::int16_t>(samples[i], -AMP_NORMALIZED,
-                                              AMP_NORMALIZED);
+    std::vector<Complex<>> timeDomainData(m_frequencyData.size());
+    fft_ptr->ifftAnalyze(m_frequencyData, timeDomainData,
+                         m_frequencyData.size());
+
+    std::vector<std::int16_t> samples;
+    samples.reserve(timeDomainData.size());
+    for (const auto &complexValue : timeDomainData) {
+        double sample = std::abs(complexValue);
+        samples.push_back(static_cast<std::int16_t>(sample * AMP_NORMALIZED));
     }
     return samples;
 }

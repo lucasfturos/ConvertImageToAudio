@@ -10,7 +10,8 @@ const double pi = M_PI;
 
 // Macros
 using namespace std::complex_literals;
-template <typename ComplexType> using Complex = std::complex<ComplexType>;
+template <typename ComplexType = double>
+using Complex = std::complex<ComplexType>;
 
 /*!
  * Classe template para realizar FFT em dados unidimensionais.
@@ -39,8 +40,8 @@ template <typename ComplexType = double> class FFT {
              std::vector<Complex<ComplexType>> &out, std::size_t n);
 
   public:
-    void ifft(std::vector<Complex<ComplexType>> &in,
-              std::vector<Complex<ComplexType>> &out, std::size_t n);
+    void ifftAnalyze(std::vector<Complex<ComplexType>> &in,
+                     std::vector<Complex<ComplexType>> &out, std::size_t n);
     void fftAnalyze(std::vector<Complex<ComplexType>> &in,
                     std::vector<Complex<ComplexType>> &out, std::size_t n);
 };

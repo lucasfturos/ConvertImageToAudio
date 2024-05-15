@@ -14,7 +14,7 @@ template <typename ComplexType>
 ComplexType FFT<ComplexType>::amp(Complex<ComplexType> z) {
     ComplexType a = z.real();
     ComplexType b = z.imag();
-    return std::log(std::sqrt(a * a + b * b));
+    return std::sqrt(a * a + b * b);
 }
 
 /*!
@@ -225,9 +225,9 @@ void FFT<ComplexType>::fftAnalyze(std::vector<Complex<ComplexType>> &in,
  * `n`: O tamanho do vetor de dados de entrada e saída.
  */
 template <typename ComplexType>
-void FFT<ComplexType>::ifft(std::vector<Complex<ComplexType>> &in,
-                            std::vector<Complex<ComplexType>> &out,
-                            std::size_t n) {
+void FFT<ComplexType>::ifftAnalyze(std::vector<Complex<ComplexType>> &in,
+                                   std::vector<Complex<ComplexType>> &out,
+                                   std::size_t n) {
     for (std::size_t i = 0; i < n; ++i) {
         in[i] = std::conj(in[i]);
     }

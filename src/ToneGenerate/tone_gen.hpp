@@ -11,9 +11,6 @@
 class ToneGenerate {
   private:
     const int SAMPLERATE = 44100;
-    const double PI = M_PI;
-    const double AMPLITUDE = 0.5;
-    const double FREQUENCY = 60.0;
     const double AMP_NORMALIZED = 32767.0;
 
   private:
@@ -23,15 +20,15 @@ class ToneGenerate {
 
   private:
     std::size_t m_imageSize;
-    std::shared_ptr<FFT<double>> fft_ptr;
-    std::vector<Complex<double>> m_imageData;
-    std::vector<Complex<double>> m_frequencyData;
+    std::shared_ptr<FFT<>> fft_ptr;
+    std::vector<Complex<>> m_imageData;
+    std::vector<Complex<>> m_frequencyData;
 
     std::vector<std::int16_t> generateWaveform();
 
   public:
     void saveAudio();
-    void setImageData(std::vector<Complex<double>> imageData, std::size_t size);
+    void setImageData(std::vector<Complex<>> imageData);
 
     ToneGenerate(const std::string &filename, int format, int channels);
 };

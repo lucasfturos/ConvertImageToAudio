@@ -11,11 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-struct Color {
-    double r = 0.0, g = 0.0, b = 0.0;
-    double h = 0.0, s = 0.0, v = 0.0;
-};
-
 namespace util {
 
 inline std::string toUppercase(const std::string &filenameAudio) {
@@ -81,6 +76,11 @@ inline int getAudioType(const std::string &extAudio) {
 } // namespace util
 
 namespace test {
+
+struct Color {
+    double r = 0.0, g = 0.0, b = 0.0;
+    double h = 0.0, s = 0.0, v = 0.0;
+};
 
 inline void printPPM(std::vector<Color> colors) {
     std::cout << "P3\n";
