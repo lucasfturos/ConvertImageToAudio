@@ -19,7 +19,8 @@ class ToneGenerate {
     int m_channels;
 
   private:
-    std::size_t m_imageSize;
+    int m_imageWidth;
+    int m_imageHeight;
     std::shared_ptr<FFT<>> fft_ptr;
     std::vector<Complex<>> m_imageData;
     std::vector<Complex<>> m_frequencyData;

@@ -24,21 +24,14 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
 
 void ToneGenerate::setImageData(std::vector<Complex<>> imageData) {
     m_imageData = imageData;
-    m_imageSize = imageData.size();
-
-    m_frequencyData.resize(m_imageSize, 0);
-    fft_ptr->fftAnalyze(imageData, m_frequencyData, m_imageSize);
+    m_frequencyData.resize(imageData.size(), 0);
+    fft_ptr->fftAnalyze(imageData, m_frequencyData, imageData.size());
 }
 
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
-    std::vector<Complex<>> timeDomainData(m_frequencyData.size());
-    fft_ptr->ifftAnalyze(m_frequencyData, timeDomainData,
-                         m_frequencyData.size());
-
     std::vector<std::int16_t> samples;
-    samples.reserve(timeDomainData.size());
-    for (const auto &complexValue : timeDomainData) {
-        double sample = std::abs(complexValue);
+    for (const auto &value : m_frequencyData) {
+        double sample = std::abs(value);
         samples.push_back(static_cast<std::int16_t>(sample * AMP_NORMALIZED));
     }
     return samples;

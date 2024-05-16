@@ -17,15 +17,14 @@ class ImageData {
     std::uint32_t *m_resizePixels;
     std::vector<Complex<>> imageData;
 
-    void resizeImage(int *width, int *height);
+    void resizeImage(int *w, int *h);
     double rgbToGrayscale(std::uint32_t pixel);
-    std::vector<int> histogramEqualization(std::vector<double> intensities);
     double applySobelFilter(const std::vector<double> &grayscaleImage, int x,
                             int y, int width, int height);
 
   public:
+    void processImagePixels();
     std::vector<Complex<>> getImageData();
-    void processImage();
 
     ImageData(const std::string &filename);
     ~ImageData();

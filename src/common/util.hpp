@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <iomanip>
@@ -81,6 +82,36 @@ struct Color {
     double r = 0.0, g = 0.0, b = 0.0;
     double h = 0.0, s = 0.0, v = 0.0;
 };
+
+inline std::vector<int> histogramEqualization(std::vector<double> intensities) {
+    const int num_bins = 256;
+    std::vector<int> histogram(num_bins, 0);
+    for (double intensity : intensities) {
+        int bin = std::min<int>(intensity * num_bins, num_bins - 1);
+        histogram[bin]++;
+    }
+
+    int count = 0;
+    int number_of_pixels = intensities.size();
+    std::vector<double> cdf(num_bins, 0.0);
+    for (int i = 0; i < num_bins; ++i) {
+        count += histogram[i];
+        cdf[i] = static_cast<double>(count) / number_of_pixels;
+    }
+
+    std::vector<int> equalized(num_bins, 0);
+    for (int i = 0; i < num_bins; ++i) {
+        equalized[i] = std::round(cdf[i] * (num_bins - 1));
+    }
+
+    std::vector<int> result;
+    result.reserve(intensities.size());
+    for (double intensity : intensities) {
+        int bin = std::min<int>(intensity * num_bins, num_bins - 1);
+        result.push_back(equalized[bin]);
+    }
+    return result;
+}
 
 inline void printPPM(std::vector<Color> colors, int width, int height) {
     std::cout << "P3\n";

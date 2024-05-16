@@ -21,7 +21,7 @@ void CApp::run() {
         throw std::runtime_error(std::string(
             "Failed to create directory for audio file: " + filenameAudio));
     }
-    m_imgAudio->processImage();
+    m_imgAudio->processImagePixels();
     m_toneGen->setImageData(m_imgAudio->getImageData());
     m_toneGen->saveAudio();
     std::cout << "Done\n";
