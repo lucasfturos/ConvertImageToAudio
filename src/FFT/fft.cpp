@@ -12,9 +12,7 @@
  */
 template <typename ComplexType>
 ComplexType FFT<ComplexType>::amp(Complex<ComplexType> z) {
-    ComplexType a = z.real();
-    ComplexType b = z.imag();
-    return std::sqrt(a * a + b * b);
+    return std::abs(z);
 }
 
 /*!
