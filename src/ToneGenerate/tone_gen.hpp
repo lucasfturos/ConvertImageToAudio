@@ -19,7 +19,8 @@ class ToneGenerate {
     int m_imageHeight;
     std::vector<double> m_imageData;
 
-    std::vector<std::int16_t> generateWaveform();
+    std::vector<double> calculateFrequencies();
+    std::vector<std::int16_t> createAudioSamples();
 
   public:
     void saveAudio();

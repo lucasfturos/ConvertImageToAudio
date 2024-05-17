@@ -29,22 +29,31 @@ void ToneGenerate::setImageData(std::vector<double> imageData,
     m_imageHeight = imageSize.height;
 }
 
-std::vector<std::int16_t> ToneGenerate::generateWaveform() {
-    int numSamples = SAMPLE_RATE * m_imageHeight;
-    double gain = 8.0;
+std::vector<double> ToneGenerate::calculateFrequencies() {
+    std::vector<double> frequencies(m_imageHeight);
     double stepSize =
-        (MAX_FREQ - MIN_FREQ) / static_cast<double>(m_imageHeight);
+        (MAX_FREQ - MIN_FREQ) / static_cast<double>(m_imageHeight - 1);
+    for (int i = 0; i < m_imageHeight; ++i) {
+        frequencies[i] = stepSize * i;
+    }
+    return frequencies;
+}
+
+std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
+    double gain = 500.0;
+    int numSamples = 60 * SAMPLE_RATE;
+    auto frequencies = calculateFrequencies();
 
     std::vector<std::int16_t> samples(numSamples, 0);
     for (int frame = 0; frame < numSamples; ++frame) {
         double t = static_cast<double>(frame) / SAMPLE_RATE;
         double signalValue = 0.0;
+        int col = (frame * m_imageWidth) / numSamples;
         for (int row = 0; row < m_imageHeight; ++row) {
             int invertedRow = m_imageHeight - 1 - row;
-            int col = (frame * m_imageWidth) / numSamples;
             double intensity =
                 m_imageData[invertedRow * m_imageWidth + col] * gain;
-            double frequency = row * stepSize;
+            double frequency = frequencies[row];
             signalValue += intensity * std::sin(2.0 * PI * frequency * t);
         }
         samples[frame] = static_cast<int16_t>((signalValue / m_imageHeight) *
@@ -54,7 +63,7 @@ std::vector<std::int16_t> ToneGenerate::generateWaveform() {
 }
 
 void ToneGenerate::saveAudio() {
-    std::vector<std::int16_t> samples = generateWaveform();
+    std::vector<std::int16_t> samples = createAudioSamples();
 
     SF_INFO info;
     info.samplerate = SAMPLE_RATE;
