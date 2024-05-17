@@ -113,6 +113,31 @@ inline std::vector<int> histogramEqualization(std::vector<double> intensities) {
     return result;
 }
 
+inline double applySobelFilter(const std::vector<double> &grayscaleImage, int x,
+                               int y, int width, int height) {
+    std::vector<std::vector<int>> sobelX = {
+        {-1, 0, 1},
+        {-2, 0, 2},
+        {-1, 0, 1},
+    };
+    std::vector<std::vector<int>> sobelY = {
+        {-1, -2, -1},
+        {0, 0, 0},
+        {1, 2, 1},
+    };
+    double gx = 0.0, gy = 0.0;
+    for (int ky = -1; ky <= 1; ++ky) {
+        for (int kx = -1; kx <= 1; ++kx) {
+            int pixelX = std::clamp(x + kx, 0, width - 1);
+            int pixelY = std::clamp(y + ky, 0, height - 1);
+            double pixel = grayscaleImage[pixelY * width + pixelX];
+            gx += pixel * sobelX[ky + 1][kx + 1];
+            gy += pixel * sobelY[ky + 1][kx + 1];
+        }
+    }
+    return std::sqrt(gx * gx + gy * gy);
+}
+
 inline void printPPM(std::vector<Color> colors, int width, int height) {
     std::cout << "P3\n";
     std::cout << width << " " << height << '\n';

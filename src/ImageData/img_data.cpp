@@ -25,36 +25,7 @@ double ImageData::rgbToGrayscale(std::uint32_t pixel) {
     double r = ((pixel >> 8 * 0) & 0xFF) / 255.0;
     double g = ((pixel >> 8 * 1) & 0xFF) / 255.0;
     double b = ((pixel >> 8 * 2) & 0xFF) / 255.0;
-    double a = ((pixel >> 8 * 3) & 0xFF) / 255.0;
-    r *= a;
-    g *= a;
-    b *= a;
     return 0.299 * r + 0.587 * g + 0.114 * b;
-}
-
-double ImageData::applySobelFilter(const std::vector<double> &grayscaleImage,
-                                   int x, int y, int width, int height) {
-    std::vector<std::vector<int>> sobelX = {
-        {-1, 0, 1},
-        {-2, 0, 2},
-        {-1, 0, 1},
-    };
-    std::vector<std::vector<int>> sobelY = {
-        {-1, -2, -1},
-        {0, 0, 0},
-        {1, 2, 1},
-    };
-    double gx = 0.0, gy = 0.0;
-    for (int ky = -1; ky <= 1; ++ky) {
-        for (int kx = -1; kx <= 1; ++kx) {
-            int pixelX = std::clamp(x + kx, 0, width - 1);
-            int pixelY = std::clamp(y + ky, 0, height - 1);
-            double pixel = grayscaleImage[pixelY * width + pixelX];
-            gx += pixel * sobelX[ky + 1][kx + 1];
-            gy += pixel * sobelY[ky + 1][kx + 1];
-        }
-    }
-    return std::sqrt(gx * gx + gy * gy);
 }
 
 void ImageData::resizeImage(int *width, int *height) {
@@ -81,19 +52,10 @@ void ImageData::processImagePixels() {
     int width, height;
     resizeImage(&width, &height);
 
-    std::vector<double> intensities(width * height);
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             std::uint32_t pixel = m_resizePixels[y * width + x];
-            intensities[y * width + x] = rgbToGrayscale(pixel);
-        }
-    }
-
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            double edgeIntensity =
-                applySobelFilter(intensities, x, y, width, height);
-            imageData.push_back(edgeIntensity);
+            imageData.push_back(rgbToGrayscale(pixel)/ 255.0);
         }
     }
 

@@ -19,8 +19,6 @@ class ImageData {
 
     void resizeImage(int *w, int *h);
     double rgbToGrayscale(std::uint32_t pixel);
-    double applySobelFilter(const std::vector<double> &grayscaleImage, int x,
-                            int y, int width, int height);
 
   public:
     void processImagePixels();
