@@ -22,7 +22,9 @@ void CApp::run() {
             "Failed to create directory for audio file: " + filenameAudio));
     }
     m_imgAudio->processImagePixels();
-    m_toneGen->setImageData(m_imgAudio->getImageData());
+    m_toneGen->setImageData(m_imgAudio->getImageData(),
+                            m_imgAudio->getImageSize().width,
+                            m_imgAudio->getImageSize().height);
     m_toneGen->saveAudio();
     std::cout << "Done\n";
 }

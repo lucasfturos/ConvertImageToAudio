@@ -19,8 +19,6 @@ ImageData::~ImageData() {
     }
 }
 
-std::vector<Complex<>> ImageData::getImageData() { return imageData; }
-
 double ImageData::rgbToGrayscale(std::uint32_t pixel) {
     double r = ((pixel >> 8 * 0) & 0xFF) / 255.0;
     double g = ((pixel >> 8 * 1) & 0xFF) / 255.0;
@@ -33,7 +31,7 @@ void ImageData::resizeImage(int *width, int *height) {
         stbi_load(m_filename.c_str(), width, height, NULL, 4));
     assert(m_pixels != nullptr && "Error loading image!");
 
-    int resizeWidth = 64 * 2;
+    int resizeWidth = 64 * 4;
     int resizeHeight = *height * resizeWidth / *width;
     m_resizePixels = static_cast<std::uint32_t *>(
         malloc(sizeof(std::uint32_t) * resizeWidth * resizeHeight));
@@ -51,11 +49,12 @@ void ImageData::resizeImage(int *width, int *height) {
 void ImageData::processImagePixels() {
     int width, height;
     resizeImage(&width, &height);
+    imageSize = {.width = width, .height = height};
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             std::uint32_t pixel = m_resizePixels[y * width + x];
-            imageData.push_back(rgbToGrayscale(pixel)/ 255.0);
+            imageData.push_back(rgbToGrayscale(pixel) / 255.0);
         }
     }
 
