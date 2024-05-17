@@ -13,6 +13,7 @@ class ToneGenerate {
     std::string m_filename;
     int m_format;
     int m_channels;
+    double m_gain;
 
   private:
     int m_imageWidth;
@@ -26,5 +27,5 @@ class ToneGenerate {
     void saveAudio();
     void setImageData(std::vector<double> imageData, Dimension imageSize);
 
-    ToneGenerate(const std::string &filename, int format, int channels);
+    ToneGenerate(const std::string &filename, int format, int channels, double gain);
 };

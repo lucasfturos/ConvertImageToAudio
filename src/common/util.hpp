@@ -50,9 +50,9 @@ inline void CLIMessageError(int argc) {
     if (argc < 2) {
         throw std::runtime_error(
             std::string("Enter an image, directory and audio name, and the "
-                        "number of channels.\nEx: "
+                        "number of channels and gain of wave.\nEx: "
                         "./src/ConvertImageToAudio assets/img/image.png "
-                        "assets/audio/out.wav 1"));
+                        "assets/audio/out.wav 1 500.0"));
     }
 }
 

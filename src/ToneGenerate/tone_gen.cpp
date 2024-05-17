@@ -1,7 +1,7 @@
 #include "tone_gen.hpp"
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
-                           int channels)
+                           int channels, double gain)
     : m_filename(filename) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
@@ -20,6 +20,7 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
         throw std::invalid_argument("Number of channels must be 1 or 2.");
     }
     m_channels = channels;
+    m_gain = gain;
 }
 
 void ToneGenerate::setImageData(std::vector<double> imageData,
@@ -40,7 +41,6 @@ std::vector<double> ToneGenerate::calculateFrequencies() {
 }
 
 std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
-    double gain = 500.0;
     int numSamples = 60 * SAMPLE_RATE;
     auto frequencies = calculateFrequencies();
 
@@ -52,7 +52,7 @@ std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
         for (int row = 0; row < m_imageHeight; ++row) {
             int invertedRow = m_imageHeight - 1 - row;
             double intensity =
-                m_imageData[invertedRow * m_imageWidth + col] * gain;
+                m_imageData[invertedRow * m_imageWidth + col] * m_gain;
             double frequency = frequencies[row];
             signalValue += intensity * std::sin(2.0 * PI * frequency * t);
         }
@@ -69,6 +69,10 @@ void ToneGenerate::saveAudio() {
     info.samplerate = SAMPLE_RATE;
     info.channels = m_channels;
     info.format = m_format | SF_FORMAT_PCM_16;
+
+    if (m_filename.empty()) {
+        throw std::invalid_argument("Filename cannot be empty.");
+    }
 
     SNDFILE *file = sf_open(m_filename.c_str(), SFM_WRITE, &info);
     if (!file) {

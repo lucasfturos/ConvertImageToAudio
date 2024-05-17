@@ -37,9 +37,11 @@ make
 4. Execute o programa:
 
 ```
-./src/ConvertImageToAudio assets/img/image.png " "assets/audio/out.wav 1
+./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0
 ```
 
 ## Créditos
 
 [Audacity](https://www.audacityteam.org/)
+[libsndfile](https://github.com/libsndfile/libsndfile)
+[stb](https://github.com/nothings/stb)
