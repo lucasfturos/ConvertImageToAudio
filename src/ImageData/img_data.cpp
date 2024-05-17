@@ -4,9 +4,6 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb/stb_image_resize.h>
 
-// #include "../common/util.hpp"
-// using namespace test;
-
 ImageData::ImageData(const std::string &filename)
     : m_filename(filename), m_pixels(nullptr), m_resizePixels(nullptr) {}
 
@@ -57,18 +54,4 @@ void ImageData::processImagePixels() {
             imageData.push_back(rgbToGrayscale(pixel) / 255.0);
         }
     }
-
-    // Teste de cores
-    // std::vector<Color> colors(width * height);
-    // for (int y = 0; y < height; ++y) {
-    //     for (int x = 0; x < width; ++x) {
-    //         double color = std::abs(imageData[y * width + x]);
-    //         colors[y * width + x] = {
-    //             .r = color /*  / 255.0 */,
-    //             .g = color /*  / 255.0 */,
-    //             .b = color /*  / 255.0 */,
-    //         };
-    //     }
-    // }
-    // printPPM(colors, width, height);
 }
