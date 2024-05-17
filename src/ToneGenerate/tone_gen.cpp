@@ -2,7 +2,7 @@
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels)
-    : m_filename(filename), fft_ptr(std::make_shared<FFT<>>()) {
+    : m_filename(filename) {
 
     std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
                              : (format == SF_FORMAT_FLAC) ? "FLAC"
@@ -22,15 +22,15 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     m_channels = channels;
 }
 
-void ToneGenerate::setImageData(std::vector<Complex<>> imageData, int width,
-                                int height) {
+void ToneGenerate::setImageData(std::vector<double> imageData,
+                                Dimension imageSize) {
     m_imageData = imageData;
-    m_imageWidth = width;
-    m_imageHeight = height;
+    m_imageWidth = imageSize.width;
+    m_imageHeight = imageSize.height;
 }
 
 std::vector<std::int16_t> ToneGenerate::generateWaveform() {
-    int numSamples = SAMPLE_RATE;
+    int numSamples = SAMPLE_RATE * m_imageHeight;
     double gain = 8.0;
     double stepSize =
         (MAX_FREQ - MIN_FREQ) / static_cast<double>(m_imageHeight);
@@ -43,9 +43,9 @@ std::vector<std::int16_t> ToneGenerate::generateWaveform() {
             int invertedRow = m_imageHeight - 1 - row;
             int col = (frame * m_imageWidth) / numSamples;
             double intensity =
-                std::abs(m_imageData[invertedRow * m_imageWidth + col]) * gain;
+                m_imageData[invertedRow * m_imageWidth + col] * gain;
             double frequency = row * stepSize;
-            signalValue += intensity * std::sin(2.0 * pi * frequency * t);
+            signalValue += intensity * std::sin(2.0 * PI * frequency * t);
         }
         samples[frame] = static_cast<int16_t>((signalValue / m_imageHeight) *
                                               AMP_NORMALIZED);
