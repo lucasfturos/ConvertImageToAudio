@@ -40,8 +40,24 @@ make
 ./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0
 ```
 
+## Screenshot
+
+**Parâmetros:**
+
+-   Ganho: 200 dB.
+
+-   Escala: Linear.
+
+### Tela do Audacity.
+
+![](/assets/screenshot/resultHouse.png)
+
 ## Créditos
 
 [Audacity](https://www.audacityteam.org/)
+
+[House.bmp - www.hlevkin.com](https://www.hlevkin.com/hlevkin/TestImages/houses.bmp)
+
 [libsndfile](https://github.com/libsndfile/libsndfile)
+
 [stb](https://github.com/nothings/stb)
