@@ -4,6 +4,8 @@ Converte imagem em áudio.
 
 Feito em C++.
 
+Tem a versão em Rust no arquivo `rust-version`.
+
 ## Instalação e Execução
 
 ### Requisitos
