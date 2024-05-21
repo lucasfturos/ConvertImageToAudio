@@ -28,33 +28,35 @@ impl ImageData {
     }
 
     #[allow(dead_code)]
-    fn to_grayscale(&self) -> DynamicImage {
-        let gray_image: ImageBuffer<Luma<u8>, Vec<u8>> =
-            ImageBuffer::from_fn(self.size.width, self.size.height, |x, y| {
+    fn to_grayscale(&self) -> Vec<u8> {
+        let mut data = Vec::new();
+        for y in 0..self.size.height {
+            for x in 0..self.size.width {
                 let pixel = self.image.get_pixel(x, y);
                 let (r, g, b) = (pixel[0] as f32, pixel[1] as f32, pixel[2] as f32);
                 let grayscale = (0.299 * r + 0.587 * g + 0.114 * b) as u8;
-                Luma([grayscale])
-            });
-        DynamicImage::ImageLuma8(gray_image)
+                data.push(grayscale);
+            }
+        }
+        data
     }
 
     #[allow(dead_code)]
     pub fn get_image_data(&self, grayscale: bool) -> Vec<u8> {
-        let img = if grayscale {
+        if grayscale {
             self.to_grayscale()
         } else {
-            self.image.clone()
-        };
-
-        let mut data = Vec::new();
-        for y in 0..self.size.height {
-            for x in 0..self.size.width {
-                let pixel = img.get_pixel(x, y);
-                data.push(pixel[0]);
+            let mut data = Vec::new();
+            for y in 0..self.size.height {
+                for x in 0..self.size.width {
+                    let pixel = self.image.get_pixel(x, y);
+                    data.push(pixel[0]);
+                    data.push(pixel[1]);
+                    data.push(pixel[2]);
+                }
             }
+            data
         }
-        data
     }
 
     #[allow(dead_code)]
@@ -62,10 +64,21 @@ impl ImageData {
         [self.size.width, self.size.height]
     }
 
+    fn to_grayscale_image(&self) -> DynamicImage {
+        let gray_image: ImageBuffer<Luma<u16>, Vec<u16>> =
+            ImageBuffer::from_fn(self.size.width, self.size.height, |x, y| {
+                let pixel = self.image.get_pixel(x, y);
+                let (r, g, b) = (pixel[0] as f32, pixel[1] as f32, pixel[2] as f32);
+                let grayscale = (0.299 * r + 0.587 * g + 0.114 * b) as u16;
+                Luma([grayscale])
+            });
+        DynamicImage::ImageLuma16(gray_image)
+    }
+
     #[allow(dead_code)]
     pub fn save_as_ppm(&self, output_path: &Path, grayscale: bool) {
         let img = if grayscale {
-            self.to_grayscale()
+            self.to_grayscale_image()
         } else {
             self.image.clone()
         };

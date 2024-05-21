@@ -15,5 +15,5 @@ cargo build
 Exemplo de execução:
 
 ```
-cargo run assets/img/image.png 256 true assets/audio/out.wav 60 false
+cargo run assets/img/image.png 256 true assets/audio/out.wav 60 100 false
 ```

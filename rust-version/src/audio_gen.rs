@@ -2,20 +2,20 @@ use hound;
 use std::{f32::consts::PI, fs, i16, process::Command};
 
 pub const MIN_FREQ: u32 = 0;
-pub const MAX_FREQ: u32 = 19000;
+pub const MAX_FREQ: u32 = 20000;
 pub const SAMPLE_RATE: u32 = 44100;
-pub const AMP_NORMALIZED: f32 = 32767.0;
 
 #[allow(dead_code)]
 pub struct AudioGenerator {
     image_data: Vec<u8>,
     width: u32,
     height: u32,
+    gain: f32,
 }
 
 impl AudioGenerator {
     #[allow(dead_code)]
-    pub fn new(image_data: Vec<u8>, width: u32, height: u32) -> Self {
+    pub fn new(image_data: Vec<u8>, width: u32, height: u32, gain: f32) -> Self {
         if image_data.is_empty() {
             panic!("Image data is empty.");
         }
@@ -23,6 +23,7 @@ impl AudioGenerator {
             image_data,
             width,
             height,
+            gain,
         }
     }
 
@@ -37,23 +38,21 @@ impl AudioGenerator {
     fn generate_samples(&self, duration: u32) -> Vec<i16> {
         let num_samples = duration * SAMPLE_RATE;
         let frequencies = self.calculate_frequency();
-        let mut samples = Vec::with_capacity(num_samples as usize);
+        let mut samples = Vec::new();
 
         for frame in 0..num_samples {
             let t = frame as f32 / SAMPLE_RATE as f32;
             let mut signal_value = 0.0;
-            let col = (frame * self.width as u32 / num_samples) as u32;
+            let col = frame as u32 * self.width / num_samples;
 
             for row in 0..self.height {
                 let inverted_row = self.height - 1 - row;
                 let intensity =
-                    self.image_data[(inverted_row * self.width + col) as usize] as f32 / 255.0;
+                    self.image_data[(inverted_row * self.width + col) as usize] as f32 * self.gain;
                 let frequency = frequencies[row as usize];
                 signal_value += intensity * (2.0 * PI * frequency * t).sin();
             }
-
-            let sample_value = ((signal_value / self.height as f32) * AMP_NORMALIZED) as i16;
-            samples.push(sample_value);
+            samples.push((signal_value / self.height as f32) as i16);
         }
 
         samples

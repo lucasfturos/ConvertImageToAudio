@@ -7,7 +7,7 @@ struct Dimension {
 };
 
 const int MIN_FREQ = 0;
-const int MAX_FREQ = 19000;
+const int MAX_FREQ = 20000;
 const int SAMPLE_RATE = 44100;
 
 const double PI = M_PI;
