@@ -34,13 +34,13 @@ case "$1" in
         ;;
     -r | --run)
         # Verifica se foi passado o caminho da imagem como parâmetro
-        if [ -z "$2" ] || [ -z "$3" ]; then
-            echo "Erro: é necessário especificar o caminho da imagem ou o ganho da onda."
+        if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+            echo "Erro: é necessário especificar o caminho da imagem, o ganho da onda ou a duração do áudio."
             exit 1
         fi
         # Comando para compilar e executar o programa;
         cmake --build build/ && ./build/src/ConvertImageToAudio "$2" \
-                "$AUDIO_OUTPUT_PATH" "1" "$3"
+                "$AUDIO_OUTPUT_PATH" "1" "$3" "$4"
         ;;
     -ppm | --run-ppm)
         # Verifica se foi passado o caminho da imagem como parâmetro

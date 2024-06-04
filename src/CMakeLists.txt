@@ -18,6 +18,7 @@ set(SRC_SOURCES
 )
 
 # Find and configure required libraries
+find_package(Threads)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
 
@@ -38,6 +39,7 @@ target_include_directories(${PROJECT_NAME}
 
 # Specify libraries or flags to use when linking
 target_link_libraries(${PROJECT_NAME}
+    PRIVATE Threads::Threads
     PRIVATE ${LIBSNDFILE_LIBRARIES}
 )
 

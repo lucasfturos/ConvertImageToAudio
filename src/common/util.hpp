@@ -47,12 +47,13 @@ inline bool createDirectory(const std::string &directoryPath) {
 }
 
 inline void CLIMessageError(int argc) {
-    if (argc < 2) {
+    if (argc < 6) {
         throw std::runtime_error(
             std::string("Enter an image, directory and audio name, and the "
-                        "number of channels and gain of wave.\nEx: "
+                        "number of channels, gain of wave and duration of "
+                        "audio in seconds.\nEx: "
                         "./src/ConvertImageToAudio assets/img/image.png "
-                        "assets/audio/out.wav 1 500.0"));
+                        "assets/audio/out.wav 1 500.0 60"));
     }
 }
 

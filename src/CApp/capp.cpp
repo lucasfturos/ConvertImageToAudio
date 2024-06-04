@@ -5,18 +5,19 @@ using namespace util;
 
 CApp::CApp(int argc, char **argv) {
     CLIMessageError(argc);
-    
+
     std::string filenameImage = argv[1];
     filenameAudio = argv[2];
 
     int channel = std::stoi(argv[3]);
     double gain = std::stod(argv[4]);
+    double duration = std::stod(argv[5]);
 
     std::string extAudio = getAudioExtension(filenameAudio);
     int format = getAudioType(toUppercase(extAudio));
 
-    m_toneGen =
-        std::make_shared<ToneGenerate>(filenameAudio, format, channel, gain);
+    m_toneGen = std::make_shared<ToneGenerate>(filenameAudio, format, channel,
+                                               gain, duration);
     m_imgAudio = std::make_shared<ImageData>(filenameImage);
 }
 

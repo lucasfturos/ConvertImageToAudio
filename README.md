@@ -39,8 +39,10 @@ make
 4. Execute o programa:
 
 ```
-./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0
+./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0 200
 ```
+
+Nota: O tempo máximo é 200s.
 
 ## Screenshot
 
