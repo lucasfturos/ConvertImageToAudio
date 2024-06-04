@@ -20,11 +20,9 @@ class ThreadPool {
                         std::unique_lock<std::mutex> lock(mtx);
                         cv.wait(lock,
                                 [this] { return stop || !tasks.empty(); });
-
                         if (stop && tasks.empty()) {
                             return;
                         }
-
                         task = std::move(tasks.front());
                         tasks.pop();
                     }
@@ -45,13 +43,13 @@ class ThreadPool {
         }
     }
 
-    void enqueue(std::function<void()> task) {
+    template <class F> void enqueue(F &&task) {
         {
             std::unique_lock<std::mutex> lock(mtx);
             if (stop) {
                 throw std::runtime_error("Enqueue on stopped ThreadPool");
             }
-            tasks.emplace(std::move(task));
+            tasks.emplace(std::forward<F>(task));
         }
         cv.notify_one();
     }

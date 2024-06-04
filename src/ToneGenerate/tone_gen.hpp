@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../common/constants.hpp"
-#include "../common/threadpool.hpp"
 #include <algorithm>
 #include <memory>
 #include <sndfile.h>
@@ -20,7 +19,6 @@ class ToneGenerate {
     int m_imageWidth;
     int m_imageHeight;
     std::vector<double> m_imageData;
-    std::unique_ptr<ThreadPool> threadpool;
 
     std::vector<double> calculateFrequencies() const;
     void processSamples(std::vector<std::int16_t> &samples, int start, int end,

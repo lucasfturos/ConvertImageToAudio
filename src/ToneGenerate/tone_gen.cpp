@@ -1,5 +1,5 @@
 #include "tone_gen.hpp"
-#include <iostream>
+#include "../common/threadpool.hpp"
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels, double gain, double duration)
@@ -27,8 +27,8 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     }
     m_gain = gain;
 
-    if (duration > 200) {
-        throw std::invalid_argument("Maximum audio duration is 200s");
+    if (duration > 100) {
+        throw std::invalid_argument("Maximum audio duration is 100s");
     }
     (duration == 0) ? m_duration = 1 : m_duration = duration;
 }
@@ -53,7 +53,6 @@ std::vector<double> ToneGenerate::calculateFrequencies() const {
 void ToneGenerate::processSamples(std::vector<std::int16_t> &samples, int start,
                                   int end,
                                   const std::vector<double> &frequencies) {
-    std::cout << "Prossing range: " << start << " to " << end << '\n';
     for (int frame = start; frame < end; ++frame) {
         double t = static_cast<double>(frame) / SAMPLE_RATE;
         double signalValue = 0.0;
@@ -73,16 +72,16 @@ void ToneGenerate::processSamples(std::vector<std::int16_t> &samples, int start,
 std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
     int numSamples = m_duration * SAMPLE_RATE;
     auto frequencies = calculateFrequencies();
-
     std::vector<std::int16_t> samples(numSamples, 0);
+    
     const int numThreads = std::thread::hardware_concurrency();
-    threadpool = std::make_unique<ThreadPool>(numThreads);
+    ThreadPool threadpool(numThreads);
     int samplesPerThread = numSamples / numThreads;
 
     for (int i = 0; i < numThreads; ++i) {
         int start = i * samplesPerThread;
         int end = (i == numThreads - 1) ? numSamples : start + samplesPerThread;
-        threadpool->enqueue([this, &samples, start, end, &frequencies] {
+        threadpool.enqueue([this, &samples, start, end, &frequencies] {
             processSamples(samples, start, end, frequencies);
         });
     }

@@ -28,7 +28,7 @@ void ImageData::resizeImage(int *width, int *height) {
         stbi_load(m_filename.c_str(), width, height, NULL, 4));
     assert(m_pixels != nullptr && "Error loading image!");
 
-    int resizeWidth = 128 * 2;
+    int resizeWidth = 128 * 4;
     int resizeHeight = *height * resizeWidth / *width;
     m_resizePixels = static_cast<std::uint32_t *>(
         malloc(sizeof(std::uint32_t) * resizeWidth * resizeHeight));
