@@ -1,5 +1,5 @@
 #include "tone_gen.hpp"
-#include <thread>
+#include <iostream>
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels, double gain, double duration)
@@ -21,6 +21,10 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
         throw std::invalid_argument("Number of channels must be 1 or 2.");
     }
     m_channels = channels;
+
+    if (gain == 0) {
+        throw std::invalid_argument("The gain cannot be zero");
+    }
     m_gain = gain;
 
     if (duration > 200) {
@@ -46,9 +50,10 @@ std::vector<double> ToneGenerate::calculateFrequencies() const {
     return frequencies;
 }
 
-void ToneGenerate::processSamplesRange(std::vector<std::int16_t> &samples,
-                                       int start, int end,
-                                       const std::vector<double> &frequencies) {
+void ToneGenerate::processSamples(std::vector<std::int16_t> &samples, int start,
+                                  int end,
+                                  const std::vector<double> &frequencies) {
+    std::cout << "Prossing range: " << start << " to " << end << '\n';
     for (int frame = start; frame < end; ++frame) {
         double t = static_cast<double>(frame) / SAMPLE_RATE;
         double signalValue = 0.0;
@@ -71,21 +76,16 @@ std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
 
     std::vector<std::int16_t> samples(numSamples, 0);
     const int numThreads = std::thread::hardware_concurrency();
-    std::vector<std::thread> threads;
+    threadpool = std::make_unique<ThreadPool>(numThreads);
     int samplesPerThread = numSamples / numThreads;
 
     for (int i = 0; i < numThreads; ++i) {
         int start = i * samplesPerThread;
         int end = (i == numThreads - 1) ? numSamples : start + samplesPerThread;
-        threads.emplace_back(&ToneGenerate::processSamplesRange, this,
-                             std::ref(samples), start, end,
-                             std::cref(frequencies));
+        threadpool->enqueue([this, &samples, start, end, &frequencies] {
+            processSamples(samples, start, end, frequencies);
+        });
     }
-
-    for (auto &thread : threads) {
-        thread.join();
-    }
-
     return samples;
 }
 

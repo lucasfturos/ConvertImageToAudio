@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../common/constants.hpp"
+#include "../common/threadpool.hpp"
 #include <algorithm>
 #include <memory>
 #include <sndfile.h>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -20,11 +20,11 @@ class ToneGenerate {
     int m_imageWidth;
     int m_imageHeight;
     std::vector<double> m_imageData;
+    std::unique_ptr<ThreadPool> threadpool;
 
     std::vector<double> calculateFrequencies() const;
-    void processSamplesRange(std::vector<std::int16_t> &samples, int start,
-                             int end, const std::vector<double> &frequencies);
-
+    void processSamples(std::vector<std::int16_t> &samples, int start, int end,
+                        const std::vector<double> &frequencies);
     std::vector<std::int16_t> createAudioSamples();
 
   public:
