@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/constants.hpp"
+#include "../Common/constants.hpp"
 #include <algorithm>
 #include <memory>
 #include <sndfile.h>

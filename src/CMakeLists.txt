@@ -3,9 +3,6 @@
 # List all the header files in the src directory
 set(SRC_HEADERS
     CApp/capp.hpp
-    common/util.hpp
-    common/constants.hpp
-    common/threadpool.hpp
     ImageData/img_data.hpp
     ToneGenerate/tone_gen.hpp
 )

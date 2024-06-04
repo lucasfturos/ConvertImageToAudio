@@ -1,5 +1,5 @@
 #include "tone_gen.hpp"
-#include "../common/threadpool.hpp"
+#include "../Common/threadpool.hpp"
 
 ToneGenerate::ToneGenerate(const std::string &filename, int format,
                            int channels, double gain, double duration)
@@ -73,7 +73,7 @@ std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
     int numSamples = m_duration * SAMPLE_RATE;
     auto frequencies = calculateFrequencies();
     std::vector<std::int16_t> samples(numSamples, 0);
-    
+
     const int numThreads = std::thread::hardware_concurrency();
     ThreadPool threadpool(numThreads);
     int samplesPerThread = numSamples / numThreads;
