@@ -11,7 +11,7 @@
 class ThreadPool {
   private:
     bool m_stop;
-    std::mutex m_mtx;
+    mutable std::mutex m_mtx;
     std::condition_variable m_cv;
     std::vector<std::jthread> m_threads;
     std::queue<std::function<void()>> m_tasks;

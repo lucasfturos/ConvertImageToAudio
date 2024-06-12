@@ -77,12 +77,17 @@ std::vector<std::int16_t> ImageToAudio::createAudioSamples() {
     const int numThreads = std::thread::hardware_concurrency();
     auto threadpool = std::make_unique<ThreadPool>(numThreads);
     int blockSize = numSamples / numThreads;
+    std::vector<std::future<void>> futures;
     for (int i = 0; i < numThreads; ++i) {
         int start = i * blockSize;
-        int end = std::min(numSamples, start + blockSize);
-        threadpool->enqueue([this, &samples, start, end, &frequencies] {
-            processSamples(samples, start, end, frequencies);
-        });
+        int end = (i == numThreads - 1) ? numSamples : start + blockSize;
+        futures.emplace_back(
+            threadpool->enqueue([this, &samples, start, end, &frequencies] {
+                processSamples(samples, start, end, frequencies);
+            }));
+    }
+    for (auto &future : futures) {
+        future.get();
     }
     return samples;
 }
