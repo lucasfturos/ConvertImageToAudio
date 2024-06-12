@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class ToneGenerate {
+class ImageToAudio {
   private:
     std::string m_filename;
     int m_format;
@@ -29,6 +29,6 @@ class ToneGenerate {
     void saveAudio();
     void setImageData(std::vector<double> imageData, Dimension imageSize);
 
-    ToneGenerate(const std::string &filename, int format, int channels,
+    ImageToAudio(const std::string &filename, int format, int channels,
                  double gain, double duration);
 };

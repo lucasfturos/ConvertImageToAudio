@@ -2,6 +2,7 @@
 
 #include <condition_variable>
 #include <functional>
+#include <future>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -43,15 +44,22 @@ class ThreadPool {
         }
     }
 
-    template <class F> void enqueue(F &&task) {
+    template <class F, class... Args>
+    std::future<typename std::result_of<F(Args...)>::type>
+    enqueue(F &&f, Args &&...args) {
+        using returnType = typename std::result_of<F(Args...)>::type;
+        auto task = std::make_shared<std::packaged_task<returnType()>>(
+            std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+        auto res = task->get_future();
         {
             std::unique_lock<std::mutex> lock(mtx);
             if (stop) {
                 throw std::runtime_error("Enqueue on stopped ThreadPool");
             }
-            tasks.emplace(std::forward<F>(task));
+            tasks.emplace([task]() { (*task)(); });
         }
         cv.notify_one();
+        return res;
     }
 
   private:

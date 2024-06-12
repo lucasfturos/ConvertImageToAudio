@@ -16,7 +16,7 @@ CApp::CApp(int argc, char **argv) {
     std::string extAudio = getAudioExtension(filenameAudio);
     int format = getAudioType(toUppercase(extAudio));
 
-    m_toneGen = std::make_shared<ToneGenerate>(filenameAudio, format, channel,
+    m_toneGen = std::make_shared<ImageToAudio>(filenameAudio, format, channel,
                                                gain, duration);
     m_imgAudio = std::make_shared<ImageData>(filenameImage);
 }

@@ -4,20 +4,22 @@
 set(SRC_HEADERS
     CApp/capp.hpp
     ImageData/img_data.hpp
-    ToneGenerate/tone_gen.hpp
+    ImageToAudio/img_audio.hpp
 )
 
 # List all the source files in the src directory
 set(SRC_SOURCES
     CApp/capp.cpp
     ImageData/img_data.cpp
-    ToneGenerate/tone_gen.cpp
+    ImageToAudio/img_audio.cpp
     main.cpp
 )
 
 # Find and configure required libraries
 find_package(Threads)
 find_package(PkgConfig REQUIRED)
+
+# PkgConfig check modules
 pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
 
 # Add executable target with source and header files

@@ -35,7 +35,8 @@ case "$1" in
     -r | --run)
         # Verifica se foi passado o caminho da imagem como parâmetro
         if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
-            echo "Erro: é necessário especificar o caminho da imagem, o ganho da onda ou a duração do áudio."
+            echo -e "Erro: é necessário especificar o caminho da imagem," \
+                    "o ganho da onda ou a duração do áudio."
             exit 1
         fi
         # Comando para compilar e executar o programa;

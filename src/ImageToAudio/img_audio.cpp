@@ -1,7 +1,7 @@
-#include "tone_gen.hpp"
+#include "img_audio.hpp"
 #include "../Common/threadpool.hpp"
 
-ToneGenerate::ToneGenerate(const std::string &filename, int format,
+ImageToAudio::ImageToAudio(const std::string &filename, int format,
                            int channels, double gain, double duration)
     : m_filename(filename) {
 
@@ -33,15 +33,15 @@ ToneGenerate::ToneGenerate(const std::string &filename, int format,
     (duration == 0) ? m_duration = 1 : m_duration = duration;
 }
 
-void ToneGenerate::setImageData(std::vector<double> imageData,
+void ImageToAudio::setImageData(std::vector<double> imageData,
                                 Dimension imageSize) {
     m_imageData = std::move(imageData);
     m_imageWidth = imageSize.width;
     m_imageHeight = imageSize.height;
 }
 
-std::vector<double> ToneGenerate::calculateFrequencies() const {
-    std::vector<double> frequencies(m_imageHeight);
+std::vector<double> ImageToAudio::calculateFrequencies() const {
+    std::vector<double> frequencies(m_imageHeight, 0);
     double stepSize =
         (MAX_FREQ - MIN_FREQ) / static_cast<double>(m_imageHeight - 1);
     for (int i = 0; i < m_imageHeight; ++i) {
@@ -50,7 +50,7 @@ std::vector<double> ToneGenerate::calculateFrequencies() const {
     return frequencies;
 }
 
-void ToneGenerate::processSamples(std::vector<std::int16_t> &samples, int start,
+void ImageToAudio::processSamples(std::vector<std::int16_t> &samples, int start,
                                   int end,
                                   const std::vector<double> &frequencies) {
     for (int frame = start; frame < end; ++frame) {
@@ -69,27 +69,26 @@ void ToneGenerate::processSamples(std::vector<std::int16_t> &samples, int start,
     }
 }
 
-std::vector<std::int16_t> ToneGenerate::createAudioSamples() {
+std::vector<std::int16_t> ImageToAudio::createAudioSamples() {
     int numSamples = m_duration * SAMPLE_RATE;
     auto frequencies = calculateFrequencies();
     std::vector<std::int16_t> samples(numSamples, 0);
 
     const int numThreads = std::thread::hardware_concurrency();
-    ThreadPool threadpool(numThreads);
-    int samplesPerThread = numSamples / numThreads;
-
+    auto threadpool = std::make_unique<ThreadPool>(numThreads);
+    int blockSize = numSamples / numThreads;
     for (int i = 0; i < numThreads; ++i) {
-        int start = i * samplesPerThread;
-        int end = (i == numThreads - 1) ? numSamples : start + samplesPerThread;
-        threadpool.enqueue([this, &samples, start, end, &frequencies] {
+        int start = i * blockSize;
+        int end = std::min(numSamples, start + blockSize);
+        threadpool->enqueue([this, &samples, start, end, &frequencies] {
             processSamples(samples, start, end, frequencies);
         });
     }
     return samples;
 }
 
-void ToneGenerate::saveAudio() {
-    std::vector<std::int16_t> samples = createAudioSamples();
+void ImageToAudio::saveAudio() {
+    auto samples = createAudioSamples();
 
     SF_INFO info;
     info.samplerate = SAMPLE_RATE;
