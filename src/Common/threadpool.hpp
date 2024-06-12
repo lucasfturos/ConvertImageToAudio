@@ -9,38 +9,46 @@
 #include <vector>
 
 class ThreadPool {
+  private:
+    bool m_stop;
+    std::mutex m_mtx;
+    std::condition_variable m_cv;
+    std::vector<std::jthread> m_threads;
+    std::queue<std::function<void()>> m_tasks;
+
   public:
     explicit ThreadPool(
         std::size_t numThreads = std::thread::hardware_concurrency())
-        : stop(false) {
-        for (std::size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back([this] {
-                while (true) {
-                    std::function<void()> task;
-                    {
-                        std::unique_lock<std::mutex> lock(mtx);
-                        cv.wait(lock,
-                                [this] { return stop || !tasks.empty(); });
-                        if (stop && tasks.empty()) {
-                            return;
-                        }
-                        task = std::move(tasks.front());
-                        tasks.pop();
+        : m_stop(false) {
+        auto task = [this] {
+            while (true) {
+                std::function<void()> task;
+                {
+                    std::unique_lock<std::mutex> lock(m_mtx);
+                    m_cv.wait(lock,
+                              [this] { return m_stop || !m_tasks.empty(); });
+                    if (m_stop && m_tasks.empty()) {
+                        break;
                     }
-                    task();
+                    task = std::move(m_tasks.front());
+                    m_tasks.pop();
                 }
-            });
+                task();
+            }
+        };
+        for (std::size_t i = 0; i < numThreads; ++i) {
+            m_threads.emplace_back(std::jthread(task));
         }
     }
 
     ~ThreadPool() {
         {
-            std::unique_lock<std::mutex> lock(mtx);
-            stop = true;
+            std::unique_lock<std::mutex> lock(m_mtx);
+            m_stop = true;
         }
-        cv.notify_all();
-        for (auto &worker : workers) {
-            worker.join();
+        m_cv.notify_all();
+        for (auto &thread : m_threads) {
+            thread.join();
         }
     }
 
@@ -52,20 +60,13 @@ class ThreadPool {
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
         auto res = task->get_future();
         {
-            std::unique_lock<std::mutex> lock(mtx);
-            if (stop) {
+            std::unique_lock<std::mutex> lock(m_mtx);
+            if (m_stop) {
                 throw std::runtime_error("Enqueue on stopped ThreadPool");
             }
-            tasks.emplace([task]() { (*task)(); });
+            m_tasks.emplace([task]() { (*task)(); });
         }
-        cv.notify_one();
+        m_cv.notify_one();
         return res;
     }
-
-  private:
-    bool stop;
-    std::mutex mtx;
-    std::condition_variable cv;
-    std::vector<std::thread> workers;
-    std::queue<std::function<void()>> tasks;
 };
