@@ -20,6 +20,10 @@ double ImageData::rgbToGrayscale(std::uint32_t pixel) {
     double r = ((pixel >> 8 * 0) & 0xFF) / 255.0;
     double g = ((pixel >> 8 * 1) & 0xFF) / 255.0;
     double b = ((pixel >> 8 * 2) & 0xFF) / 255.0;
+    double a = ((pixel >> 8 * 3) & 0xFF) / 255.0;
+    r *= a;
+    g *= a;
+    b *= a;
     return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
@@ -28,7 +32,7 @@ void ImageData::resizeImage(int *width, int *height) {
         stbi_load(m_filename.c_str(), width, height, NULL, 4));
     assert(m_pixels != nullptr && "Error loading image!");
 
-    int resizeWidth = 128 * 4;
+    int resizeWidth = 512;
     int resizeHeight = *height * resizeWidth / *width;
     m_resizePixels = static_cast<std::uint32_t *>(
         malloc(sizeof(std::uint32_t) * resizeWidth * resizeHeight));

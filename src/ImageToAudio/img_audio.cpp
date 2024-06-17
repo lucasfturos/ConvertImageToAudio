@@ -38,15 +38,20 @@ void ImageToAudio::setImageData(std::vector<double> imageData,
     m_imageData = std::move(imageData);
     m_imageWidth = imageSize.width;
     m_imageHeight = imageSize.height;
+    if (static_cast<int>(m_imageData.size()) != m_imageWidth * m_imageHeight) {
+        throw std::invalid_argument(
+            "ImageData size does not match image dimensions.");
+    }
 }
 
 std::vector<double> ImageToAudio::calculateFrequencies() const {
-    std::vector<double> frequencies(m_imageHeight, 0);
+    std::vector<double> frequencies(m_imageHeight);
     double stepSize =
         (MAX_FREQ - MIN_FREQ) / static_cast<double>(m_imageHeight - 1);
-    for (int i = 0; i < m_imageHeight; ++i) {
-        frequencies[i] = stepSize * i;
-    }
+    std::iota(frequencies.begin(), frequencies.end(), 0);
+    std::transform(
+        frequencies.begin(), frequencies.end(), frequencies.begin(),
+        [stepSize](double index) { return MIN_FREQ + index * stepSize; });
     return frequencies;
 }
 
@@ -77,14 +82,14 @@ std::vector<std::int16_t> ImageToAudio::createAudioSamples() {
     const int numThreads = std::thread::hardware_concurrency();
     auto threadpool = std::make_unique<ThreadPool>(numThreads);
     int blockSize = numSamples / numThreads;
+
     std::vector<std::future<void>> futures;
     for (int i = 0; i < numThreads; ++i) {
         int start = i * blockSize;
-        int end = (i == numThreads - 1) ? numSamples : start + blockSize;
-        futures.emplace_back(
-            threadpool->enqueue([this, &samples, start, end, &frequencies] {
-                processSamples(samples, start, end, frequencies);
-            }));
+        int end = i == numThreads ? numSamples : start + blockSize;
+        futures.emplace_back(threadpool->enqueue(
+            std::bind(&ImageToAudio::processSamples, this, std::ref(samples),
+                      start, end, std::cref(frequencies))));
     }
     for (auto &future : futures) {
         future.get();

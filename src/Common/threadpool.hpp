@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <future>
@@ -10,41 +11,43 @@
 
 class ThreadPool {
   private:
-    bool m_stop;
+    std::atomic<bool> m_stop;
     mutable std::mutex m_mtx;
     std::condition_variable m_cv;
-    std::vector<std::jthread> m_threads;
+    std::vector<std::thread> m_threads;
     std::queue<std::function<void()>> m_tasks;
 
   public:
-    explicit ThreadPool(
-        std::size_t numThreads = std::thread::hardware_concurrency())
+    explicit ThreadPool(std::size_t numThreads =
+                            std::max(1u, std::thread::hardware_concurrency()))
         : m_stop(false) {
-        auto task = [this] {
-            while (true) {
-                std::function<void()> task;
-                {
-                    std::unique_lock<std::mutex> lock(m_mtx);
-                    m_cv.wait(lock,
-                              [this] { return m_stop || !m_tasks.empty(); });
-                    if (m_stop && m_tasks.empty()) {
-                        break;
-                    }
-                    task = std::move(m_tasks.front());
-                    m_tasks.pop();
-                }
-                task();
-            }
-        };
         for (std::size_t i = 0; i < numThreads; ++i) {
-            m_threads.emplace_back(std::jthread(task));
+            m_threads.emplace_back([this] {
+                while (true) {
+                    std::function<void()> task;
+                    {
+                        std::unique_lock<std::mutex> lock(m_mtx);
+                        m_cv.wait(lock, [this] {
+                            return m_stop.load(std::memory_order_relaxed) ||
+                                   !m_tasks.empty();
+                        });
+                        if (m_stop.load(std::memory_order_relaxed) &&
+                            m_tasks.empty()) {
+                            break;
+                        }
+                        task = std::move(m_tasks.front());
+                        m_tasks.pop();
+                    }
+                    task();
+                }
+            });
         }
     }
 
     ~ThreadPool() {
         {
             std::unique_lock<std::mutex> lock(m_mtx);
-            m_stop = true;
+            m_stop.store(true, std::memory_order_relaxed);
         }
         m_cv.notify_all();
         for (auto &thread : m_threads) {
@@ -61,10 +64,10 @@ class ThreadPool {
         auto res = task->get_future();
         {
             std::unique_lock<std::mutex> lock(m_mtx);
-            if (m_stop) {
+            if (m_stop.load(std::memory_order_relaxed)) {
                 throw std::runtime_error("Enqueue on stopped ThreadPool");
             }
-            m_tasks.emplace([task]() { (*task)(); });
+            m_tasks.emplace([task = std::move(task)]() { (*task)(); });
         }
         m_cv.notify_one();
         return res;

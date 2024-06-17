@@ -3,6 +3,7 @@
 #include "../Common/constants.hpp"
 #include <algorithm>
 #include <memory>
+#include <numeric>
 #include <sndfile.h>
 #include <string>
 #include <vector>

@@ -1,6 +1,8 @@
 # Convert Image to Audio
 
-Converte imagem em áudio.
+Converte imagens em áudio.
+
+O programa só aceita como saída áudios no formato FLAC, OGG e WAV.
 
 Feito em C++.
 
@@ -39,10 +41,16 @@ make
 4. Execute o programa:
 
 ```
+./src/ConvertImageToAudio caminha/da/imagem.{jpg, png, etc} caminho/de/saída/do/audio.{flac, ogg, wav} <Mono = 1 | Estero = 2> <Ganho em dB> <duração em segundos>
+```
+
+-   Exemplo de uso:
+
+```
 ./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0 100
 ```
 
-Nota: O tempo máximo é 100s.
+Nota: O tempo máximo de duração é de 100s.
 
 ## Screenshot
 
