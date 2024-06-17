@@ -25,6 +25,7 @@ add_compile_options(
     -Wall -Wextra -Wpedantic -Werror -pedantic -g -Ofast
 )
 
+add_subdirectory(docs)
 add_subdirectory(src)
 
 # -------------------------------------------------------------------------
