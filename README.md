@@ -50,7 +50,13 @@ make
 ./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0 100
 ```
 
-Nota: O tempo máximo de duração é de 100s.
+**Nota:** O tempo máximo de duração é de 100s.
+
+5. Arquivo `build.sh`:
+
+O arquivo build.sh tem todas instruções para usar. Mas, caso tenha dúvidas, execute o comando `./build.sh -h` para receber mais informações. Ele automatiza os comandos explicados acima.
+
+**Aviso:** É necessário ter instalado o Audacity caso queira usar a função `./build.sh -a`.
 
 ## Screenshot
 
