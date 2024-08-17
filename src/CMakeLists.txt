@@ -34,7 +34,7 @@ link_directories(${LIBSNDFILE_LIBRARY_DIRS})
 
 # Specify target-specific include directories
 target_include_directories(${PROJECT_NAME} 
-    PRIVATE src 
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ 
 )
 
 # Specify libraries or flags to use when linking

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ImageData/img_data.hpp"
-#include "../ImageToAudio/img_audio.hpp"
+#include "ImageData/img_data.hpp"
+#include "ImageToAudio/img_audio.hpp"
 #include <iostream>
 #include <memory>
 

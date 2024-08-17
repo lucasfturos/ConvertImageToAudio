@@ -1,5 +1,5 @@
 #include "img_audio.hpp"
-#include "../Common/threadpool.hpp"
+#include "Common/threadpool.hpp"
 
 ImageToAudio::ImageToAudio(const std::string &filename, int format,
                            int channels, double gain, double duration)

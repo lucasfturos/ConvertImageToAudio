@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common/constants.hpp"
+#include "Common/constants.hpp"
 #include <algorithm>
 #include <cassert>
 #include <limits>
