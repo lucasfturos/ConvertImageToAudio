@@ -7,11 +7,16 @@
 
 class CApp {
   private:
-    std::shared_ptr<ImageToAudio> m_toneGen;
-    std::shared_ptr<ImageData> m_imgAudio;
+    std::shared_ptr<ImageToAudio> m_ImageToAudio;
+    std::shared_ptr<ImageData> m_ImageData;
+
+    int m_Argc;
+    char **m_Argv;
 
   private:
-    std::string filenameAudio;
+    std::string m_FilenameAudio;
+
+    void setup();
 
   public:
     void run();

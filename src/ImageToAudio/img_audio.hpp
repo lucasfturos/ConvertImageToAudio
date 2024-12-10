@@ -27,7 +27,10 @@ class ImageToAudio {
     std::vector<std::int16_t> createAudioSamples();
 
   public:
+    void setup();
     void saveAudio();
+    void playAudio();
+
     void setImageData(std::vector<double> imageData, Dimension imageSize);
 
     ImageToAudio(const std::string &filename, int format, int channels,

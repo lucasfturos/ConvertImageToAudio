@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -47,13 +48,13 @@ inline bool createDirectory(const std::string &directoryPath) {
 }
 
 inline void CLIMessageError(int argc) {
-    if (argc < 6) {
+    if (argc < 7) {
         throw std::runtime_error(
             std::string("Enter an image, directory and audio name, and the "
-                        "number of channels, gain of wave and duration of "
-                        "audio in seconds.\nEx: "
+                        "number of channels, gain of wave, duration of "
+                        "audio in seconds and mode (save or play).\nEx: "
                         "./src/ConvertImageToAudio assets/img/image.png "
-                        "assets/audio/out.wav 1 500.0 60"));
+                        "assets/audio/out.wav 1 500.0 60 save"));
     }
 }
 
@@ -73,6 +74,26 @@ inline int getAudioType(const std::string &extAudio) {
         throw std::invalid_argument("Invalid audio file extension!");
     }
     return it->second;
+}
+
+inline void audioModeSavePlay(const std::string &mode,
+                      const std::vector<std::function<void()>> &func) {
+    if (mode == "save") {
+        if (!func.empty()) {
+            func[0]();
+        } else {
+            throw std::runtime_error("No function provided for 'save' mode.");
+        }
+    } else if (mode == "play") {
+        if (func.size() > 1) {
+            func[1]();
+        } else {
+            throw std::runtime_error("No function provided for 'play' mode.");
+        }
+    } else {
+        throw std::runtime_error(
+            "Please provide the correct mode (save or play).");
+    }
 }
 
 } // namespace util

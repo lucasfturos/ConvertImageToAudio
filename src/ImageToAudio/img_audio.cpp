@@ -1,36 +1,40 @@
 #include "img_audio.hpp"
+#include "AlsaPlayer/alsa_player.hpp"
+#include "Common/constants.hpp"
 #include "Common/threadpool.hpp"
+#include <chrono>
 
 ImageToAudio::ImageToAudio(const std::string &filename, int format,
                            int channels, double gain, double duration)
-    : m_filename(filename) {
+    : m_filename(filename), m_format(format), m_channels(channels),
+      m_gain(gain), m_duration(duration) {}
 
-    std::string formatName = (format == SF_FORMAT_WAV)    ? "WAV"
-                             : (format == SF_FORMAT_FLAC) ? "FLAC"
-                             : (format == SF_FORMAT_OGG)  ? "OGG"
-                                                          : "Unknown";
+void ImageToAudio::setup() {
+    std::string formatName = (m_format == SF_FORMAT_WAV)    ? "WAV"
+                             : (m_format == SF_FORMAT_FLAC) ? "FLAC"
+                             : (m_format == SF_FORMAT_OGG)  ? "OGG"
+                                                            : "Unknown";
     if (formatName.compare("Unknown") == 0) {
         throw std::invalid_argument("Invalid audio format.");
     }
-    m_format = format;
 
-    std::string channelName = (channels == 1)   ? "MONO"
-                              : (channels == 2) ? "STEREO"
-                                                : "Invalid";
+    std::string channelName = (m_channels == 1)   ? "MONO"
+                              : (m_channels == 2) ? "STEREO"
+                                                  : "Invalid";
     if (channelName.compare("Invalid") == 0) {
         throw std::invalid_argument("Number of channels must be 1 or 2.");
     }
-    m_channels = channels;
 
-    if (gain == 0) {
+    if (m_gain == 0) {
         throw std::invalid_argument("The gain cannot be zero");
     }
-    m_gain = gain;
 
-    if (duration > 100) {
+    if (m_duration > 100) {
         throw std::invalid_argument("Maximum audio duration is 100s");
     }
-    (duration == 0) ? m_duration = 1 : m_duration = duration;
+    if (m_duration == 0) {
+        m_duration = 1;
+    }
 }
 
 void ImageToAudio::setImageData(std::vector<double> imageData,
@@ -116,4 +120,29 @@ void ImageToAudio::saveAudio() {
     sf_write_short(file, samples.data(),
                    static_cast<sf_count_t>(samples.size()));
     sf_close(file);
+}
+
+void ImageToAudio::playAudio() {
+    ALSAPlayer player;
+    player.initialize(SAMPLE_RATE, m_channels);
+
+    auto samples = createAudioSamples();
+    std::vector<char> buffer(samples.size() * sizeof(int16_t));
+
+    std::copy(reinterpret_cast<char *>(samples.data()),
+              reinterpret_cast<char *>(samples.data()) + buffer.size(),
+              buffer.data());
+
+    std::size_t bufferSize = 4096;
+    std::size_t offset = 0;
+
+    while (offset < buffer.size()) {
+        std::size_t chunkSize = std::min(bufferSize, buffer.size() - offset);
+        player.play(buffer.data() + offset, chunkSize);
+        offset += chunkSize;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(
+            (chunkSize / sizeof(int16_t)) * 1000 / SAMPLE_RATE));
+    }
+    player.stop();
 }

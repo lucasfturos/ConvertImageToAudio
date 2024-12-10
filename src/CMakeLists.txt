@@ -2,6 +2,7 @@
 
 # List all the header files in the src directory
 set(SRC_HEADERS
+    AlsaPlayer/alsa_player.hpp
     CApp/capp.hpp
     ImageData/img_data.hpp
     ImageToAudio/img_audio.hpp
@@ -9,6 +10,7 @@ set(SRC_HEADERS
 
 # List all the source files in the src directory
 set(SRC_SOURCES
+    AlsaPlayer/alsa_player.cpp
     CApp/capp.cpp
     ImageData/img_data.cpp
     ImageToAudio/img_audio.cpp
@@ -16,7 +18,8 @@ set(SRC_SOURCES
 )
 
 # Find and configure required libraries
-find_package(Threads)
+find_package(Threads REQUIRED)
+find_package(ALSA REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 # PkgConfig check modules
@@ -39,6 +42,7 @@ target_include_directories(${PROJECT_NAME}
 
 # Specify libraries or flags to use when linking
 target_link_libraries(${PROJECT_NAME}
+    PRIVATE ALSA::ALSA
     PRIVATE Threads::Threads
     PRIVATE ${LIBSNDFILE_LIBRARIES}
 )

@@ -17,6 +17,7 @@ Tem a versão em Rust no arquivo `rust-version`.
 -   Make
 -   SndFile
 -   stb
+-   Alsa
 
 ### Instruções:
 

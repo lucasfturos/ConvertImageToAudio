@@ -30,14 +30,15 @@ case "$1" in
         ;;
     -r | --run)
         # Verifica se foi passado o caminho da imagem como parâmetro
-        if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+        if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ]; then
             echo -e "Erro: é necessário especificar o caminho da imagem," \
-                    "o ganho da onda ou a duração do áudio."
+                    "o ganho da onda, a duração do áudio, ou o modo de "  \
+                    "execução (salvar ou reproduzir)."
             exit 1
         fi
         # Comando para compilar e executar o programa;
         cmake --build build/ && ./build/src/ConvertImageToAudio "$2" \
-                "$AUDIO_OUTPUT_PATH" "1" "$3" "$4"
+                "$AUDIO_OUTPUT_PATH" "1" "$3" "$4" "$5"
         ;;
     -a  | --audacity)
         audacity "$AUDIO_OUTPUT_PATH" 2>/dev/null
