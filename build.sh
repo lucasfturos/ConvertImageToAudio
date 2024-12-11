@@ -9,7 +9,7 @@ show_use() {
     echo -e "\t-a\t--audacity\tAbrir o áudio no Audacity"
     echo -e "\t-b\t--build\t\tConstruir o programa"
     echo -e "\t-i\t--init\t\tInicializar o diretório de build"
-    echo -e "\t-r\t--run\t\tExecutar o programa, ex: $0 -r /caminho/para/imagem.png 500 100"
+    echo -e "\t-r\t--run\t\tExecutar o programa, ex: $0 -r /caminho/para/imagem.png 500 100 save"
 }
 
 # Caso não informe nenhum argumento

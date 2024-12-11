@@ -42,13 +42,13 @@ make
 4. Execute o programa:
 
 ```
-./src/ConvertImageToAudio caminha/da/imagem.{jpg, png, etc} caminho/de/saída/do/audio.{flac, ogg, wav} <Mono = 1 | Estero = 2> <Ganho em dB> <duração em segundos>
+./src/ConvertImageToAudio caminha/da/imagem.{jpg, png, etc} caminho/de/saída/do/audio.{flac, ogg, wav} <Mono = 1 | Estero = 2> <Ganho em dB> <duração em segundos> <modo de execução (play/save)>
 ```
 
 -   Exemplo de uso:
 
 ```
-./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0 100
+./src/ConvertImageToAudio assets/img/image.png assets/audio/out.wav 1 500.0 100 save
 ```
 
 **Nota:** O tempo máximo de duração é de 100s.
